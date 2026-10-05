@@ -4,181 +4,279 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>bento-academy UI mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Silkscreen&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f6f5f2;--panel:#ffffff;--ink:#1d1d1f;--muted:#6b6b70;--line:#e3e1dc;
-  --accent:#c2410c;--accent-soft:#fff1e8;--ok:#15803d;--ok-soft:#e8f6ed;
-  --bad:#b91c1c;--bad-soft:#fdecec;--warn:#a16207;--warn-soft:#fdf6e3;
-  --code-bg:#1e1e24;--code-ink:#e6e6e6;--code-muted:#7d7d88;--code-hl:#3a2a20;
-  --radius:10px;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --bg:#e4d9c9;          /* beige page, like the animal sheet */
+  --panel:#fbf6ec;       /* cream card */
+  --panel-2:#f1e8d8;     /* inset areas */
+  --ink:#4a3b2c;         /* dark brown pixel lines and text */
+  --muted:#8a7a66;
+  --accent:#e0784f;      /* cat orange */
+  --accent-ink:#ffffff;
+  --accent-soft:#f7dccd;
+  --mint:#dbe7d2;        /* header bar, like the pet card */
+  --ok:#5b7a4f;--ok-soft:#dbe7d2;
+  --bad:#c84a3a;--bad-soft:#f6d9d2;
+  --warn:#b8862f;--warn-soft:#f5e6c4;
+  --shadow:#cbbda8;
+  --code-bg:#2e2a24;--code-ink:#f1e7d3;--code-muted:#8a7d6a;--code-hl:#4a3a2c;
+  --code-kw:#f0a070;--code-cm:#9fbf8a;
+  --px:3px;
+  --pixel:"Pixelify Sans","Silkscreen",ui-monospace,monospace;
+  --label:"Silkscreen","Pixelify Sans",ui-monospace,monospace;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
 }
-@media (prefers-color-scheme:dark){:root{
-  --bg:#141417;--panel:#1c1c20;--ink:#ececf0;--muted:#9a9aa3;--line:#2c2c33;
-  --accent:#fb923c;--accent-soft:#2a1d14;--ok:#4ade80;--ok-soft:#14261b;
-  --bad:#f87171;--bad-soft:#2b1717;--warn:#facc15;--warn-soft:#2a2410;
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#231e19;--panel:#2f2822;--panel-2:#3a3129;--ink:#efe3cf;--muted:#a8977f;
+  --accent:#f08a5d;--accent-soft:#4a3125;--mint:#34402f;--ok:#9cc48a;--ok-soft:#2f3d2a;
+  --bad:#f08272;--bad-soft:#4a2620;--warn:#e8bd5f;--warn-soft:#45381c;--shadow:#16120e;
+  --code-bg:#1b1814;
 }}
+:root[data-theme="dark"]{
+  --bg:#231e19;--panel:#2f2822;--panel-2:#3a3129;--ink:#efe3cf;--muted:#a8977f;
+  --accent:#f08a5d;--accent-soft:#4a3125;--mint:#34402f;--ok:#9cc48a;--ok-soft:#2f3d2a;
+  --bad:#f08272;--bad-soft:#4a2620;--warn:#e8bd5f;--warn-soft:#45381c;--shadow:#16120e;
+  --code-bg:#1b1814;
+}
 *{box-sizing:border-box}
-body{margin:0;font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
-button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 12px}
-button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-button:hover{border-color:var(--accent)}
-code,pre{font-family:var(--mono)}
-.mock-nav{display:flex;gap:8px;padding:8px 16px;background:var(--ink);color:var(--bg);font-size:13px;align-items:center;flex-wrap:wrap}
-.mock-nav button{background:transparent;color:var(--bg);border-color:#555;padding:3px 10px;font-size:13px}
-.mock-nav button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+html{-webkit-font-smoothing:none}
+body{margin:0;font:17px/1.45 var(--pixel);background:var(--bg);color:var(--ink)}
+code{font-family:var(--mono);font-size:.85em;background:var(--panel-2);padding:0 4px}
+svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
+
+/* ---------- pixel primitives ---------- */
+/* Notched-corner pixel border: four hard shadows, no blur. */
+.px{
+  box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),
+    0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),
+    var(--px) 0 0 0 var(--ink);
+  margin:var(--px);
+}
+.px-drop{
+  box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),
+    0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),
+    var(--px) 0 0 0 var(--ink),
+    0 calc(3*var(--px)) 0 0 var(--shadow);
+}
+.btn{
+  font:15px var(--label);cursor:pointer;border:0;padding:7px 14px;margin:var(--px);
+  background:var(--panel);color:var(--ink);
+}
+.btn:hover{background:var(--panel-2)}
+.btn:active{transform:translateY(var(--px));box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn small{font-size:11px;opacity:.85}
+.label{font-family:var(--label);font-size:13px;letter-spacing:.02em;text-transform:uppercase}
+
+/* ---------- mockup switcher ---------- */
+.mock-nav{display:flex;gap:6px;padding:8px 16px;background:var(--ink);color:var(--bg);align-items:center;flex-wrap:wrap}
+.mock-nav span{font:13px var(--label)}
+.mock-nav .btn{font-size:12px;padding:4px 10px}
+.mock-nav .btn.on{background:var(--accent);color:#fff}
 .screen{display:none}.screen.on{display:block}
 
-/* home */
-.home{max-width:960px;margin:0 auto;padding:32px 16px}
-.home h1{margin:0 0 4px;font-size:28px}
-.home .sub{color:var(--muted);margin:0 0 24px}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;cursor:pointer}
-.card:hover{border-color:var(--accent)}
-.card h3{margin:0 0 4px}.card p{margin:0 0 12px;color:var(--muted);font-size:14px}
-.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
-.bar>i{display:block;height:100%;background:var(--accent)}
-.meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:6px}
-.card.empty{border-style:dashed;cursor:default;display:flex;align-items:center;justify-content:center;color:var(--muted);min-height:140px;text-align:center}
-.continue{margin-top:24px;background:var(--accent-soft);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+/* ---------- home ---------- */
+.home{max-width:880px;margin:0 auto;padding:36px 16px 48px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand h1{margin:0;font:28px var(--label)}
+.home .sub{color:var(--muted);margin:6px 0 28px}
+.course{background:var(--panel)}
+.course .head{background:var(--mint);padding:8px 16px;border-bottom:var(--px) solid var(--ink);text-align:center}
+.course .body{padding:20px;display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+.course h2{margin:0 0 4px;font:22px var(--label)}
+.course p{margin:0 0 14px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:1fr auto;gap:2px 24px;font-family:var(--label);font-size:13px;margin-bottom:14px}
+.stats span:nth-child(even){text-align:right}
+.blocks{display:flex;gap:3px;flex-wrap:wrap}
+.blocks i{width:12px;height:14px;background:var(--panel-2);outline:2px solid var(--ink);outline-offset:-2px}
+.blocks i.f{background:var(--accent)}
+.modules{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;padding:0 20px 20px}
+.mod{background:var(--panel-2);padding:12px 6px 8px;text-align:center;cursor:pointer}
+.mod .art{height:48px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:6px}
+.mod .name{font:11px var(--label);line-height:1.2}
+.mod .st{font-size:12px;color:var(--muted)}
+.mod.locked{cursor:default}
+.mod.locked .art{filter:grayscale(1) opacity(.35)}
+.mod.cur{background:var(--accent-soft)}
+.continue{margin-top:22px;background:var(--panel);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 
-/* lesson layout */
-.top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
-.crumbs{color:var(--muted);font-size:14px}.crumbs b{color:var(--ink)}
+/* ---------- lesson chrome ---------- */
+.top{display:flex;align-items:center;gap:12px;padding:8px 16px;background:var(--mint);border-bottom:var(--px) solid var(--ink);flex-wrap:wrap}
+.crumbs{font-size:15px;color:var(--muted)}.crumbs b{color:var(--ink);font-weight:600}
 .top .spacer{flex:1}
-.steps{display:flex;gap:4px;flex-wrap:wrap}
-.step{font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--panel)}
-.step.done{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
-.step.cur{color:#fff;background:var(--accent);border-color:var(--accent)}
-.layout{display:grid;grid-template-columns:240px minmax(0,1fr) minmax(0,1.15fr);height:calc(100vh - 100px)}
-.side{border-right:1px solid var(--line);overflow:auto;padding:12px;background:var(--panel)}
-.side h4{margin:14px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-.side a{display:flex;gap:8px;align-items:center;padding:5px 8px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:14px}
-.side a:hover{background:var(--bg)}.side a.cur{background:var(--accent-soft);font-weight:600}
-.dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:10px}
-.dot.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.steps{display:flex;gap:2px;flex-wrap:wrap}
+.step{font:12px var(--label);padding:4px 9px;margin:var(--px);background:var(--panel);color:var(--muted)}
+.step.done{background:var(--ok-soft);color:var(--ok)}
+.step.done::before{content:"✓ "}
+.step.cur{background:var(--accent);color:#fff}
+.layout{display:grid;grid-template-columns:250px minmax(0,1fr) minmax(0,1.15fr);height:calc(100vh - 96px)}
+.side{border-right:var(--px) solid var(--ink);overflow:auto;padding:10px 10px 20px;background:var(--panel)}
+.side h4{margin:14px 4px 6px;display:flex;align-items:center;gap:8px;font:12px var(--label);color:var(--muted)}
+.side a{display:flex;gap:8px;align-items:center;padding:4px 8px;color:var(--ink);text-decoration:none;font-size:15px;cursor:pointer}
+.side a:hover{background:var(--panel-2)}
+.side a.cur{background:var(--accent-soft);font-weight:600}
+.box{width:14px;height:14px;flex:none;outline:2px solid var(--ink);outline-offset:-2px;display:grid;place-items:center;font:10px var(--label);color:#fff}
+.box.done{background:var(--ok);outline-color:var(--ok)}
 .side .quiz{color:var(--muted)}
-.left{overflow:auto;padding:20px 24px;border-right:1px solid var(--line)}
-.left h2{margin:0 0 8px;font-size:22px}
-.left h3{margin:20px 0 6px;font-size:16px}
+.left{overflow:auto;padding:20px 24px;border-right:var(--px) solid var(--ink);background:var(--panel)}
+.left h2{margin:0 0 10px;font:22px var(--label)}
+.left h3{margin:22px 0 6px;font:15px var(--label)}
 .left p{margin:0 0 10px}
-.ex{background:var(--code-bg);color:var(--code-ink);padding:12px;border-radius:8px;font-size:13px;overflow:auto}
-.task{background:var(--accent-soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:6px}
-.fold{border:1px solid var(--line);border-radius:8px;margin:10px 0;background:var(--panel)}
-.fold summary{padding:10px 14px;cursor:pointer;font-weight:600}
-.fold .body{padding:0 14px 12px;font-size:14px}
-.lock{font-size:12px;color:var(--muted);font-weight:400;margin-left:6px}
-.right{display:flex;flex-direction:column;min-height:0}
-.tool{display:flex;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel);align-items:center;flex-wrap:wrap}
-.tool .file{font-family:var(--mono);font-size:13px;color:var(--muted);margin-right:auto}
-.sync{font-size:12px;color:var(--ok)}
-.editor{flex:1;background:var(--code-bg);color:var(--code-ink);font:13px/1.6 var(--mono);overflow:auto;padding:10px 0;min-height:0}
+.ex{background:var(--code-bg);color:var(--code-ink);padding:12px;font:13px/1.55 var(--mono);overflow:auto;margin:6px var(--px) 10px}
+.task{background:var(--accent-soft);padding:10px 14px;margin:8px var(--px)}
+.task .label{display:block;color:var(--accent);margin-bottom:2px}
+.fold{background:var(--panel);margin:12px var(--px)}
+.fold summary{padding:8px 12px;cursor:pointer;font:14px var(--label);list-style:none;display:flex;align-items:center;gap:8px}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary::before{content:"▶";font-size:10px}
+.fold[open] summary::before{content:"▼"}
+.fold .body{padding:0 14px 12px;font-size:15px}
+.lock{font:11px var(--label);color:var(--muted);margin-left:auto}
+.right{display:flex;flex-direction:column;min-height:0;background:var(--panel)}
+.tool{display:flex;gap:6px;padding:8px 10px;border-bottom:var(--px) solid var(--ink);background:var(--panel);align-items:center;flex-wrap:wrap}
+.tool .file{font:12px var(--mono);color:var(--muted);margin-right:auto}
+.sync{font:11px var(--label);color:var(--ok)}
+.editor{flex:1;background:var(--code-bg);color:var(--code-ink);font:13px/1.65 var(--mono);overflow:auto;padding:10px 0;min-height:0}
 .ln{display:flex;white-space:pre}
-.ln .n{width:44px;text-align:right;padding-right:12px;color:var(--code-muted);user-select:none;flex:none}
-.ln.hl{background:var(--code-hl)}
-.ln .cm{color:#8fbf7f}.ln .kw{color:#c792ea}.ln .st{color:#f0c674}
-.review .ln{cursor:pointer}.review .ln:hover .n{color:var(--accent)}
-.review .ln.flag .n::before{content:"● ";color:var(--accent)}
-.results{border-top:1px solid var(--line);background:var(--panel);max-height:40%;overflow:auto;padding:10px 14px}
-.results h4{margin:0 0 8px;display:flex;justify-content:space-between;font-size:14px}
-.chk{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ln .n{width:46px;text-align:right;padding-right:12px;color:var(--code-muted);user-select:none;flex:none}
+.ln .cm{color:var(--code-cm)}.ln .kw{color:var(--code-kw)}
+.review .ln{cursor:pointer}.review .ln:hover{background:var(--code-hl)}
+.review .ln.flag .n{color:var(--accent)}
+.review .ln.flag .n::before{content:"■ "}
+.results{border-top:var(--px) solid var(--ink);background:var(--panel);max-height:42%;overflow:auto;padding:10px 14px}
+.results h4{margin:0 0 6px;display:flex;justify-content:space-between;align-items:center;font:13px var(--label)}
+.chk{display:flex;gap:10px;padding:6px 0;border-bottom:2px dashed var(--panel-2);font-size:15px}
 .chk:last-child{border:0}
-.chk .ic{flex:none;width:20px;text-align:center;font-weight:700}
-.chk.pass .ic{color:var(--ok)}.chk.fail .ic{color:var(--bad)}
-.chk small{display:block;color:var(--muted)}
-.tag{font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);margin-left:6px;color:var(--muted)}
-.tag.bp{border-color:var(--accent);color:var(--accent)}
-.comment{margin:4px 12px 8px 56px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:13px/1.4 system-ui,sans-serif;white-space:normal}
+.chk .ic{flex:none;width:18px;height:18px;display:grid;place-items:center;font:12px var(--label);color:#fff;margin-top:2px}
+.chk.pass .ic{background:var(--ok)}.chk.fail .ic{background:var(--bad)}
+.chk small{display:block;color:var(--muted);font-size:14px}
+.chk.fail small.why{color:var(--bad)}
+.tag{font:10px var(--label);padding:1px 6px;margin-left:6px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.comment{margin:4px 14px 10px 58px;background:var(--panel);color:var(--ink);padding:8px 10px;font:15px/1.4 var(--pixel);white-space:normal}
 .comment .row{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
-.comment select,.comment textarea{font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px}
+.comment select,.comment textarea{font:14px var(--pixel);background:var(--panel-2);color:var(--ink);border:2px solid var(--ink);border-radius:0;padding:3px 4px}
 .comment textarea{width:100%;min-height:44px}
-.sev-blocker{color:var(--bad)}.sev-major{color:var(--warn)}
-.score{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
-.score div{background:var(--bg);border-radius:8px;padding:8px;text-align:center;font-size:13px;color:var(--muted)}
-.score b{display:block;font-size:20px;color:var(--ink)}
-.pr{font-size:13px;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
+.score{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 12px}
+.score div{background:var(--panel-2);padding:8px;text-align:center;font:11px var(--label);color:var(--muted)}
+.score b{display:block;font:22px var(--label);color:var(--ink)}
+.pr{font-size:15px;color:var(--muted);padding:8px 12px;border-bottom:var(--px) solid var(--ink);background:var(--panel)}
 .pr b{color:var(--ink)}
-.badge{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--warn-soft);color:var(--warn);margin-left:6px}
-.opt{display:block;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:6px 0;cursor:pointer;background:var(--panel)}
-.opt.right-ans{border-color:var(--ok);background:var(--ok-soft)}
-.note{font-size:13px;color:var(--muted)}
+.badge{display:inline-block;font:10px var(--label);padding:2px 7px;background:var(--warn-soft);color:var(--warn);margin-left:6px}
+.opt{display:block;background:var(--panel);padding:8px 12px;margin:10px var(--px);cursor:pointer}
+.opt:hover{background:var(--panel-2)}
+.opt.right-ans{background:var(--ok-soft)}
+.note{font-size:15px;color:var(--muted)}
+.bubble{display:flex;gap:12px;align-items:flex-end;margin:16px 0}
+.bubble .say{background:var(--panel);padding:8px 12px;font-size:15px}
+.answer{width:calc(100% - 2*var(--px));min-height:90px;background:var(--panel-2);color:var(--ink);border:0;padding:8px;font:16px var(--pixel)}
+.win{background:var(--ok-soft);padding:12px 14px;margin:18px var(--px);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 @media (max-width:900px){
   .layout{grid-template-columns:1fr;height:auto}
   .side{display:none}
-  .left{border-right:0;border-bottom:1px solid var(--line)}
+  .left{border-right:0;border-bottom:var(--px) solid var(--ink)}
   .editor{min-height:360px}
+  .course .body{grid-template-columns:1fr;justify-items:start}
+  .modules{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
 <body>
 
 <div class="mock-nav">
-  <span>Mockup, click to switch screens:</span>
-  <button data-s="home" class="on">1 Home</button>
-  <button data-s="predict">2 Predict</button>
-  <button data-s="review">3 Review PR</button>
-  <button data-s="fix">4 Fix + Run tests</button>
-  <button data-s="defend">5 Defend</button>
+  <span>Mockup ▸</span>
+  <button class="btn px on" data-s="home">1 Home</button>
+  <button class="btn px" data-s="predict">2 Predict</button>
+  <button class="btn px" data-s="review">3 Review PR</button>
+  <button class="btn px" data-s="fix">4 Fix + Run tests</button>
+  <button class="btn px" data-s="defend">5 Defend</button>
+  <button class="btn px" id="theme" style="margin-left:auto">☾ theme</button>
 </div>
 
 <!-- HOME -->
 <section class="screen on" id="home">
   <div class="home">
-    <h1>🍱 bento-academy</h1>
+    <div class="brand"><span data-sprite="bento" data-size="5"></span><h1>bento-academy</h1></div>
     <p class="sub">Learn one small box at a time.</p>
-    <div class="cards">
-      <div class="card" data-go="fix">
-        <h3>Backend for AI engineers</h3>
-        <p>APIs, streaming, SSE, WebSocket, webhooks, and a capstone.</p>
-        <div class="bar"><i style="width:18%"></i></div>
-        <div class="meta"><span>6 of 34 lessons</span><span>Module 2 of 6</span></div>
+
+    <div class="course px">
+      <div class="head label">Course 1</div>
+      <div class="body">
+        <span data-sprite="mascot" data-size="9"></span>
+        <div>
+          <h2>Backend for AI engineers</h2>
+          <p>APIs, streaming, SSE, WebSocket, webhooks, and a capstone.</p>
+          <div class="stats">
+            <span>Lessons</span><span>8 / 34</span>
+            <span>Quizzes</span><span>1 / 6</span>
+            <span>Review accuracy</span><span>72%</span>
+            <span>Now</span><span>Streaming</span>
+          </div>
+          <div class="blocks" id="blocks"></div>
+        </div>
       </div>
-      <div class="card empty">Add a course by dropping a folder into <code>courses/</code></div>
+      <div class="modules">
+        <div class="mod px" data-go="fix"><div class="art"><span data-sprite="bird" data-size="5"></span></div><div class="name">API basics</div><div class="st">7/7 ✓</div></div>
+        <div class="mod px cur" data-go="fix"><div class="art"><span data-sprite="cat" data-size="5"></span></div><div class="name">Streaming</div><div class="st">1/5</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="dog" data-size="4"></span></div><div class="name">SSE</div><div class="st">0/5</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="chicken" data-size="5"></span></div><div class="name">WebSocket</div><div class="st">0/6</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="rabbit" data-size="5"></span></div><div class="name">Webhooks</div><div class="st">0/6</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="turtle" data-size="5"></span></div><div class="name">Capstone</div><div class="st">0/5</div></div>
+      </div>
     </div>
-    <div class="continue">
-      <span>Continue where you left off: <b>2.2 StreamingResponse</b>, step Fix</span>
-      <button class="primary" data-go="fix">Continue →</button>
+
+    <div class="continue px">
+      <span>Continue: <b>2.2 StreamingResponse</b> · step Fix</span>
+      <button class="btn primary px-drop" data-go="fix">Continue ▸</button>
     </div>
   </div>
 </section>
 
-<!-- shared lesson chrome is duplicated per screen for a static mockup -->
 <template id="chrome">
   <div class="top">
     <span class="crumbs">Backend for AI engineers › Streaming › <b>2.2 StreamingResponse</b></span>
     <span class="spacer"></span>
     <div class="steps">
-      <span class="step" data-k="concept">Concept</span>
-      <span class="step" data-k="predict">Predict</span>
-      <span class="step" data-k="review">Review</span>
-      <span class="step" data-k="fix">Fix</span>
-      <span class="step" data-k="prove">Prove</span>
-      <span class="step" data-k="defend">Defend</span>
+      <span class="step px" data-k="concept">Concept</span>
+      <span class="step px" data-k="predict">Predict</span>
+      <span class="step px" data-k="review">Review</span>
+      <span class="step px" data-k="fix">Fix</span>
+      <span class="step px" data-k="prove">Prove</span>
+      <span class="step px" data-k="defend">Defend</span>
     </div>
   </div>
 </template>
 <template id="side">
   <nav class="side">
-    <h4>1 · API fundamentals</h4>
-    <a><span class="dot done">✓</span>1.1 Methods & status codes</a>
-    <a><span class="dot done">✓</span>1.2 Pydantic models</a>
-    <a><span class="dot done">✓</span>1.3 Async vs sync</a>
-    <a><span class="dot done">✓</span>1.4 Timeouts & retries</a>
-    <a><span class="dot done">✓</span>1.5 Error handling</a>
-    <a><span class="dot done">✓</span>1.6 Pagination</a>
-    <a><span class="dot"></span>1.7 Auth: API key & JWT</a>
-    <a class="quiz"><span class="dot"></span>Quiz · Design question</a>
-    <h4>2 · Streaming</h4>
-    <a><span class="dot done">✓</span>2.1 Generators</a>
-    <a class="cur"><span class="dot"></span>2.2 StreamingResponse</a>
-    <a><span class="dot"></span>2.3 Chunked transfer</a>
-    <a><span class="dot"></span>2.4 Backpressure</a>
-    <a><span class="dot"></span>2.5 Client disconnects</a>
-    <a class="quiz"><span class="dot"></span>Quiz · Design question</a>
-    <h4>3 · SSE</h4><a><span class="dot"></span>3.1 Event format</a><a><span class="dot"></span>…</a>
-    <h4>4 · WebSocket</h4><a><span class="dot"></span>…</a>
-    <h4>5 · Webhooks</h4><a><span class="dot"></span>…</a>
-    <h4>6 · Capstone</h4><a><span class="dot"></span>…</a>
+    <h4><span data-sprite="bird" data-size="2"></span>1 · API basics</h4>
+    <a><span class="box done">✓</span>1.1 Methods & status codes</a>
+    <a><span class="box done">✓</span>1.2 Pydantic models</a>
+    <a><span class="box done">✓</span>1.3 Async vs sync</a>
+    <a><span class="box done">✓</span>1.4 Timeouts & retries</a>
+    <a><span class="box done">✓</span>1.5 Error handling</a>
+    <a><span class="box done">✓</span>1.6 Pagination</a>
+    <a><span class="box done">✓</span>1.7 Auth: API key & JWT</a>
+    <a class="quiz"><span class="box done">✓</span>Quiz · Design question</a>
+    <h4><span data-sprite="cat" data-size="2"></span>2 · Streaming</h4>
+    <a><span class="box done">✓</span>2.1 Generators</a>
+    <a class="cur"><span class="box"></span>2.2 StreamingResponse</a>
+    <a><span class="box"></span>2.3 Chunked transfer</a>
+    <a><span class="box"></span>2.4 Backpressure</a>
+    <a><span class="box"></span>2.5 Client disconnects</a>
+    <a class="quiz"><span class="box"></span>Quiz · Design question</a>
+    <h4><span data-sprite="dog" data-size="2"></span>3 · SSE</h4><a><span class="box"></span>3.1 Event format</a><a><span class="box"></span>…</a>
+    <h4><span data-sprite="chicken" data-size="2"></span>4 · WebSocket</h4><a><span class="box"></span>…</a>
+    <h4><span data-sprite="rabbit" data-size="2"></span>5 · Webhooks</h4><a><span class="box"></span>…</a>
+    <h4><span data-sprite="turtle" data-size="2"></span>6 · Capstone</h4><a><span class="box"></span>…</a>
   </nav>
 </template>
 
@@ -189,19 +287,19 @@ code,pre{font-family:var(--mono)}
     <div class="left">
       <h2>Predict</h2>
       <p class="note">Read the code on the right. Answer before you run it.</p>
-      <h3>Q1. The client reads the stream as it arrives. When does it see the first token?</h3>
-      <label class="opt">A. After ~1.0 s, when the whole response is ready</label>
-      <label class="opt right-ans">B. After ~0.1 s, the first <code>yield</code> ✓</label>
-      <label class="opt">C. Immediately, before the generator starts</label>
-      <p class="note">✓ Correct. <code>StreamingResponse</code> sends each chunk as the generator yields it. Click <b>Run it</b> to see the timings.</p>
-      <h3>Q2. Does the response have a <code>Content-Length</code> header?</h3>
-      <label class="opt">A. Yes, FastAPI computes it</label>
-      <label class="opt">B. No, the length is unknown up front</label>
+      <h3>Q1 · When does the client see the first token?</h3>
+      <label class="opt px">A. After ~1.0 s, when the whole response is ready</label>
+      <label class="opt px right-ans">B. After ~0.1 s, at the first <code>yield</code> ✓</label>
+      <label class="opt px">C. Immediately, before the generator starts</label>
+      <div class="bubble"><span data-sprite="cat" data-size="4"></span><div class="say px">Correct! <code>StreamingResponse</code> sends each chunk as it is yielded. Press <b>Run it</b> to see the timings.</div></div>
+      <h3>Q2 · Is there a <code>Content-Length</code> header?</h3>
+      <label class="opt px">A. Yes, FastAPI computes it</label>
+      <label class="opt px">B. No, the length is unknown up front</label>
     </div>
     <div class="right">
-      <div class="tool"><span class="file">predict/snippet.py (read-only)</span><button class="primary">▶ Run it</button></div>
+      <div class="tool"><span class="file">predict/snippet.py · read-only</span><button class="btn primary px">▶ Run it</button></div>
       <div class="editor" data-code="predict"></div>
-      <div class="results"><h4>Output</h4><pre style="margin:0;font-size:13px">t=0.10s  b'tok0 '
+      <div class="results"><h4>Output</h4><pre style="margin:0;font:13px/1.5 var(--mono)">t=0.10s  b'tok0 '
 t=0.20s  b'tok1 '
 …
 t=1.00s  b'tok9 '</pre></div>
@@ -215,19 +313,18 @@ t=1.00s  b'tok9 '</pre></div>
     <div data-side></div>
     <div class="left">
       <h2>Review the PR</h2>
-      <p>An AI agent opened this PR: <i>“Add /chat/stream endpoint that streams LLM tokens.”</i> The tests it wrote pass. Would you merge it?</p>
-      <p class="note">Click a line number to leave a comment. Pick severity and category, and say why in one line.</p>
-      <div class="task">Find the blockers. You can leave as many comments as you want; comments on correct code count against precision.</div>
-      <h3>Your review</h3>
+      <p>An AI agent opened this PR: <i>“Add /chat/stream endpoint that streams LLM tokens.”</i> Its own tests pass. Would you merge it?</p>
+      <p class="note">Click a line to comment. Pick severity and category, then say why in one line.</p>
+      <div class="task px"><span class="label">Goal</span>Find the blockers. Comments on correct code count as false alarms.</div>
+      <h3>Your score</h3>
       <div class="score">
-        <div><b>2 / 3</b>blockers found</div>
-        <div><b>1 / 2</b>majors found</div>
-        <div><b>1</b>false alarm</div>
+        <div class="px"><b>2/3</b>blockers</div>
+        <div class="px"><b>1/2</b>majors</div>
+        <div class="px"><b>1</b>false alarm</div>
       </div>
-      <details class="fold"><summary>Missed: line 13 — blocker</summary><div class="body">The generator never stops when the client disconnects. Each abandoned tab keeps billing LLM tokens. Fix: catch cancellation and close the upstream stream in <code>finally</code>.</div></details>
-      <details class="fold"><summary>Model review (how a Lead would write it)</summary><div class="body">Blocking: <code>time.sleep</code> inside an async generator stalls the event loop for every user…</div></details>
-      <button class="primary" style="margin-top:8px">Submit review</button>
-      <button>Next: fix it →</button>
+      <details class="fold px"><summary>Missed · line 13 · blocker</summary><div class="body">The loop never stops when the client disconnects. Every closed tab keeps spending LLM tokens. Fix: check for disconnect and close the upstream stream in <code>finally</code>.</div></details>
+      <details class="fold px"><summary>Model review (how a Lead writes it)</summary><div class="body">Blocking: <code>time.sleep</code> inside an async generator stalls the event loop for every user…</div></details>
+      <div style="margin-top:12px"><button class="btn primary px-drop">Submit review</button> <button class="btn px">Next: fix it ▸</button></div>
     </div>
     <div class="right review">
       <div class="pr"><b>PR #12</b> by <b>ai-agent</b><span class="badge">AI-generated</span> · app/chat.py · +24 −0</div>
@@ -242,9 +339,9 @@ t=1.00s  b'tok9 '</pre></div>
     <div data-side></div>
     <div class="left">
       <h2>2.2 StreamingResponse</h2>
-      <p>A normal response is built in full, then sent. A <b>streaming</b> response is sent piece by piece while your code is still producing it. In FastAPI you return a <code>StreamingResponse</code> wrapping a generator; each <code>yield</code> becomes one chunk on the wire…</p>
+      <p>A normal response is built in full, then sent. A <b>streaming</b> response is sent piece by piece while your code is still producing it. In FastAPI you return a <code>StreamingResponse</code> that wraps a generator; each <code>yield</code> becomes one chunk on the wire…</p>
       <h3>Worked example</h3>
-      <pre class="ex">async def tokens():
+      <pre class="ex px">async def tokens():
     for t in ["Hel", "lo"]:
         yield t.encode()
 
@@ -252,30 +349,30 @@ t=1.00s  b'tok9 '</pre></div>
 async def demo():
     return StreamingResponse(tokens(), media_type="text/plain")</pre>
       <h3>Your task</h3>
-      <div class="task">Fix the PR you reviewed: stream tokens from <code>fake_llm()</code> without blocking the event loop, and stop generating when the client disconnects.</div>
-      <details class="fold"><summary>Hints (1 of 3 shown)</summary><div class="body">1. Which call in the generator blocks the whole event loop? There is an async version of it.</div></details>
-      <details class="fold"><summary>Best practice <span class="lock">unlocks when tests pass · open early</span></summary><div class="body">
-        <b>In production</b> · <b>Common mistakes</b> · <b>Trade-offs</b> · <b>What breaks at scale</b> · <b>Security & reliability</b> · <b>Observability</b>
-      </div></details>
-      <details class="fold"><summary>Stretch: cap stream duration at 60 s <span class="lock">optional · own tests</span></summary><div class="body">…</div></details>
-      <details class="fold"><summary>Read more</summary><div class="body">FastAPI: Stream Data · Starlette: Responses · HTTPX: Streaming responses</div></details>
+      <div class="task px"><span class="label">Task</span>Fix the PR you reviewed: stream tokens from <code>fake_llm()</code> without blocking the event loop, and stop when the client disconnects.</div>
+      <details class="fold px"><summary>Hints <span class="lock">1 of 3</span></summary><div class="body">1. Which call in the generator blocks the whole event loop? There is an async version of it.</div></details>
+      <details class="fold px"><summary>Best practice <span class="lock">🔒 unlocks on pass · open early</span></summary><div class="body">In production · Common mistakes · Trade-offs · What breaks at scale · Security & reliability · Observability</div></details>
+      <details class="fold px"><summary>Stretch: cap stream at 60 s <span class="lock">optional</span></summary><div class="body">…</div></details>
+      <details class="fold px"><summary>Read more</summary><div class="body">FastAPI: Stream Data · Starlette: Responses · HTTPX: Streaming responses</div></details>
     </div>
     <div class="right">
       <div class="tool">
         <span class="file">exercises/…/02-streaming-response/main.py</span>
-        <span class="sync">● synced with disk</span>
-        <button class="primary">▶ Run tests <small>Ctrl+Enter</small></button>
-        <button>Hint</button><button>Show solution</button><button>Reset</button>
+        <span class="sync">■ synced</span>
+      </div>
+      <div class="tool">
+        <button class="btn primary px-drop">▶ Run tests <small>Ctrl+Enter</small></button>
+        <button class="btn px">Hint</button><button class="btn px">Solution</button><button class="btn px">Reset</button>
       </div>
       <div class="editor" data-code="fix"></div>
       <div class="results">
         <h4><span>Tests · 3 of 4 passed</span><span class="note">0.9 s</span></h4>
         <div class="chk pass"><span class="ic">✓</span><div>Endpoint returns 200 with text/plain</div></div>
         <div class="chk pass"><span class="ic">✓</span><div>Tokens arrive in more than one chunk</div></div>
-        <div class="chk pass"><span class="ic">✓</span><div>First chunk arrives before the stream ends <span class="tag bp">best practice</span></div></div>
-        <div class="chk fail"><span class="ic">✗</span><div>Generator stops after the client disconnects <span class="tag bp">best practice</span>
-          <small>Expected the fake LLM to stop within 0.5 s of disconnect; it produced all 50 tokens. Hint: wrap the loop in try/finally.</small>
-          <small><a href="#" style="color:var(--muted)">Show details</a></small></div></div>
+        <div class="chk pass"><span class="ic">✓</span><div>First chunk arrives before the stream ends<span class="tag">best practice</span></div></div>
+        <div class="chk fail"><span class="ic">✗</span><div>Generator stops after the client disconnects<span class="tag">best practice</span>
+          <small class="why">Expected the fake LLM to stop within 0.5 s of disconnect; it produced all 50 tokens.</small>
+          <small>Hint: wrap the loop in try/finally. · <u>Show details</u></small></div></div>
       </div>
     </div>
   </div>
@@ -289,21 +386,24 @@ async def demo():
       <h2>Defend it</h2>
       <p class="note">Answer out loud or in the box, then reveal the model answer.</p>
       <h3>Interview 1</h3>
-      <p>Your streaming endpoint works locally but users behind the company proxy get the whole answer at once after 20 s. Walk me through how you'd debug it and what you'd change.</p>
-      <textarea style="width:100%;min-height:90px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" placeholder="Your answer…"></textarea>
-      <details class="fold"><summary>Reveal model answer</summary><div class="body">Suspect buffering by an intermediary…</div></details>
+      <p>Streaming works locally, but users behind the company proxy get the whole answer at once after 20 s. How do you debug it, and what do you change?</p>
+      <textarea class="answer px" placeholder="Your answer…"></textarea>
+      <details class="fold px"><summary>Reveal model answer</summary><div class="body">Suspect buffering by an intermediary…</div></details>
       <h3>Interview 2</h3>
       <p>Why might you choose NDJSON over SSE for an internal service-to-service token stream?</p>
-      <details class="fold"><summary>Reveal model answer</summary><div class="body">…</div></details>
-      <h3>Lesson complete</h3>
-      <p>✓ Predict · ✓ Review (2/3 blockers) · ✓ Tests · ✓ Prove · <button class="primary">Next lesson →</button></p>
+      <details class="fold px"><summary>Reveal model answer</summary><div class="body">…</div></details>
+      <div class="win px">
+        <span data-sprite="mascot" data-size="5"></span>
+        <div style="flex:1"><span class="label">Lesson complete!</span><br>✓ Predict · ✓ Review 2/3 · ✓ Tests · ✓ Prove</div>
+        <button class="btn primary px-drop">Next lesson ▸</button>
+      </div>
     </div>
     <div class="right">
-      <div class="tool"><span class="file">Best practice</span></div>
+      <div class="tool"><span class="label">Best practice</span></div>
       <div class="left" style="border:0">
-        <h3>In production</h3><p>Behind nginx or a CDN, disable response buffering for streaming routes…</p>
+        <h3>In production</h3><p>Behind nginx or a CDN, turn off response buffering for streaming routes…</p>
         <h3>Common mistakes</h3>
-        <pre class="ex"># ✗ blocks every user
+        <pre class="ex px"># ✗ blocks every user
 time.sleep(0.1)
 # ✓
 await asyncio.sleep(0.1)</pre>
@@ -316,7 +416,85 @@ await asyncio.sleep(0.1)</pre>
 </section>
 
 <script>
-const code = {
+/* ---------- pixel sprites: one char = one pixel ---------- */
+const PAL={K:"#2b2420",B:"#96523a",O:"#ef8a62",Y:"#e0aa50",R:"#d63434",W:"#ffffff",G:"#5b6657",
+           C:"#f3e9d6",N:"#b07a4f",M:"#9fbf8a",P:"#f4a6a0"};
+const SPRITES={
+  bento:[
+    "KKKKKKKKKKKK",
+    "KCCCCKYYYYYK",
+    "KCCRCKYYYYYK",
+    "KCCCCKKKKKKK",
+    "KKKKKKMMOMMK",
+    "KOOOOKMMMMMK",
+    "KOOOOKMOMMMK",
+    "KKKKKKKKKKKK"],
+  mascot:[            // the bento cat
+    ".N........N.",
+    "NNN......NNN",
+    "NNNNNNNNNNNN",
+    "NNNKNNNNKNNN",
+    "NNNNNNNNNNNN",
+    "PPNNNKKNNNPP",
+    "NNNNNNNNNNNN",
+    ".NNNNNNNNNN.",
+    "..K.K..K.K.."],
+  bird:[
+    "..WWW....",
+    "OOWWW....",
+    "..WWW....",
+    "..WWWWWW.",
+    "..WWWWWW.",
+    "...K.....",
+    "...K....."],
+  cat:[
+    "O.O......",
+    "OOO......",
+    "OOO....O.",
+    ".OOOO..O.",
+    ".OOOOO.O.",
+    ".OOOOOOO.",
+    ".OOOOOO.."],
+  dog:[
+    "..BBB.......B",
+    "KBBBKK......B",
+    "BBBBKKBBBBBBB",
+    "....KKBBBBBBB",
+    "....KKBBBBBBB",
+    ".....B....B..",
+    ".....B....B.."],
+  chicken:[
+    "..RR.....",
+    ".YY......",
+    "RYY......",
+    ".YYYYYYY.",
+    ".YYYYYY..",
+    "..YYYY...",
+    "....G....",
+    "....G...."],
+  rabbit:[
+    "..W.W....",
+    "..W.W....",
+    "..W.W....",
+    ".WWWWW...",
+    "BWWWWWWW.",
+    "..WWWWWW.",
+    ".WWWWWWWW"],
+  turtle:[
+    "...GGGG...",
+    "..GGGGGG..",
+    ".GGGGGGGG.",
+    "OOGGGGGGG.",
+    "..O....O.."]
+};
+function sprite(name,size){
+  const g=SPRITES[name],h=g.length,w=g[0].length;let r="";
+  g.forEach((row,y)=>[...row].forEach((c,x)=>{if(c!==".")r+=`<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${PAL[c]}"/>`}));
+  return `<svg class="sprite" viewBox="0 0 ${w} ${h}" width="${w*size}" height="${h*size}" aria-hidden="true">${r}</svg>`;
+}
+
+/* ---------- code panels ---------- */
+const code={
 predict:`from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 import asyncio
@@ -375,36 +553,45 @@ function paint(src){
     return `<div class="ln" data-l="${i+1}"><span class="n">${i+1}</span><span>${l}</span></div>`;
   }).join("");
 }
+
+/* ---------- build screens ---------- */
+const chromeHtml=document.getElementById("chrome").innerHTML, sideHtml=document.getElementById("side").innerHTML;
+const order=["concept","predict","review","fix","prove","defend"];
+document.querySelectorAll("[data-step]").forEach(s=>{
+  s.insertAdjacentHTML("afterbegin",chromeHtml);
+  s.querySelector("[data-side]").outerHTML=sideHtml;
+  const cur=order.indexOf(s.dataset.step);
+  s.querySelectorAll(".step").forEach(st=>{const i=order.indexOf(st.dataset.k);if(i<cur)st.classList.add("done");if(i===cur)st.classList.add("cur")});
+});
 document.querySelectorAll("[data-code]").forEach(el=>el.innerHTML=paint(code[el.dataset.code]));
-// pre-filled review comments
+document.querySelectorAll("[data-sprite]").forEach(el=>el.innerHTML=sprite(el.dataset.sprite,+el.dataset.size||4));
+document.getElementById("blocks").innerHTML=Array.from({length:34},(_,i)=>`<i class="${i<8?"f":""}"></i>`).join("");
+
+/* review comments */
 const rv=document.querySelector('#review [data-code]');
 function addComment(line,sev,cat,text){
   const ln=rv.querySelector(`[data-l="${line}"]`);ln.classList.add("flag");
-  const c=document.createElement("div");c.className="comment";
-  c.innerHTML=`<div class="row"><select><option ${sev=="blocker"?"selected":""}>blocker</option><option ${sev=="major"?"selected":""}>major</option><option ${sev=="nit"?"selected":""}>nit</option></select>
-  <select><option ${cat=="correctness"?"selected":""}>correctness</option><option ${cat=="security"?"selected":""}>security</option><option ${cat=="scale"?"selected":""}>scale</option><option ${cat=="reliability"?"selected":""}>reliability</option><option ${cat=="style"?"selected":""}>style</option></select></div>
-  <textarea>${text}</textarea>`;
+  const opt=(v,list)=>list.map(o=>`<option ${o===v?"selected":""}>${o}</option>`).join("");
+  const c=document.createElement("div");c.className="comment px";
+  c.innerHTML=`<div class="row"><select>${opt(sev,["blocker","major","nit"])}</select><select>${opt(cat,["correctness","security","scale","reliability","style"])}</select></div><textarea>${text}</textarea>`;
   ln.after(c);
 }
 addComment(14,"blocker","scale","time.sleep in an async generator blocks the event loop for every request.");
 addComment(17,"major","reliability","No media_type, and prompt has no length limit.");
 rv.addEventListener("click",e=>{const ln=e.target.closest(".ln");if(ln&&!ln.classList.contains("flag"))addComment(+ln.dataset.l,"major","correctness","")});
-// chrome
-const chromeHtml=document.getElementById("chrome").innerHTML, side=document.getElementById("side").innerHTML;
-const order=["concept","predict","review","fix","prove","defend"];
-document.querySelectorAll("[data-step]").forEach(s=>{
-  s.insertAdjacentHTML("afterbegin",chromeHtml);
-  s.querySelector("[data-side]").outerHTML=side;
-  const cur=order.indexOf(s.dataset.step);
-  s.querySelectorAll(".step").forEach(st=>{const i=order.indexOf(st.dataset.k);if(i<cur)st.classList.add("done");if(i===cur)st.classList.add("cur")});
-});
+
+/* navigation + theme */
 function show(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));
-  document.querySelectorAll(".mock-nav button").forEach(b=>b.classList.toggle("on",b.dataset.s===id));
+  document.querySelectorAll(".mock-nav [data-s]").forEach(b=>b.classList.toggle("on",b.dataset.s===id));
   window.scrollTo(0,0);
 }
 document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>show(b.dataset.s));
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(b.dataset.go));
+document.getElementById("theme").onclick=()=>{
+  const r=document.documentElement, dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;
+  r.dataset.theme=dark?"light":"dark";
+};
 </script>
 </body>
 </html>
