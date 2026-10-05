@@ -200,7 +200,7 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
   <button class="btn px" data-s="review">3 Review PR</button>
   <button class="btn px" data-s="fix">4 Fix + Run tests</button>
   <button class="btn px" data-s="defend">5 Defend</button>
-  <button class="btn px" id="theme" style="margin-left:auto">☾ theme</button>
+  <button class="btn px" id="theme" style="margin-left:auto">theme</button>
 </div>
 
 <!-- HOME -->
@@ -226,12 +226,12 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
         </div>
       </div>
       <div class="modules">
-        <div class="mod px" data-go="fix"><div class="art"><span data-sprite="bird" data-size="5"></span></div><div class="name">API basics</div><div class="st">7/7 ✓</div></div>
-        <div class="mod px cur" data-go="fix"><div class="art"><span data-sprite="cat" data-size="5"></span></div><div class="name">Streaming</div><div class="st">1/5</div></div>
-        <div class="mod px locked"><div class="art"><span data-sprite="dog" data-size="4"></span></div><div class="name">SSE</div><div class="st">0/5</div></div>
-        <div class="mod px locked"><div class="art"><span data-sprite="chicken" data-size="5"></span></div><div class="name">WebSocket</div><div class="st">0/6</div></div>
-        <div class="mod px locked"><div class="art"><span data-sprite="rabbit" data-size="5"></span></div><div class="name">Webhooks</div><div class="st">0/6</div></div>
-        <div class="mod px locked"><div class="art"><span data-sprite="turtle" data-size="5"></span></div><div class="name">Capstone</div><div class="st">0/5</div></div>
+        <div class="mod px" data-go="fix"><div class="art"><span data-sprite="onigiri" data-size="5"></span></div><div class="name">API basics</div><div class="st">7/7 ✓</div></div>
+        <div class="mod px cur" data-go="fix"><div class="art"><span data-sprite="ramen" data-size="5"></span></div><div class="name">Streaming</div><div class="st">1/5</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="dango" data-size="4"></span></div><div class="name">SSE</div><div class="st">0/5</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="sushi" data-size="5"></span></div><div class="name">WebSocket</div><div class="st">0/6</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="taiyaki" data-size="5"></span></div><div class="name">Webhooks</div><div class="st">0/6</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="bento" data-size="4"></span></div><div class="name">Capstone</div><div class="st">0/5</div></div>
       </div>
     </div>
 
@@ -258,7 +258,7 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
 </template>
 <template id="side">
   <nav class="side">
-    <h4><span data-sprite="bird" data-size="2"></span>1 · API basics</h4>
+    <h4><span data-sprite="onigiri" data-size="2"></span>1 · API basics</h4>
     <a><span class="box done">✓</span>1.1 Methods & status codes</a>
     <a><span class="box done">✓</span>1.2 Pydantic models</a>
     <a><span class="box done">✓</span>1.3 Async vs sync</a>
@@ -267,17 +267,17 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
     <a><span class="box done">✓</span>1.6 Pagination</a>
     <a><span class="box done">✓</span>1.7 Auth: API key & JWT</a>
     <a class="quiz"><span class="box done">✓</span>Quiz · Design question</a>
-    <h4><span data-sprite="cat" data-size="2"></span>2 · Streaming</h4>
+    <h4><span data-sprite="ramen" data-size="2"></span>2 · Streaming</h4>
     <a><span class="box done">✓</span>2.1 Generators</a>
     <a class="cur"><span class="box"></span>2.2 StreamingResponse</a>
     <a><span class="box"></span>2.3 Chunked transfer</a>
     <a><span class="box"></span>2.4 Backpressure</a>
     <a><span class="box"></span>2.5 Client disconnects</a>
     <a class="quiz"><span class="box"></span>Quiz · Design question</a>
-    <h4><span data-sprite="dog" data-size="2"></span>3 · SSE</h4><a><span class="box"></span>3.1 Event format</a><a><span class="box"></span>…</a>
-    <h4><span data-sprite="chicken" data-size="2"></span>4 · WebSocket</h4><a><span class="box"></span>…</a>
-    <h4><span data-sprite="rabbit" data-size="2"></span>5 · Webhooks</h4><a><span class="box"></span>…</a>
-    <h4><span data-sprite="turtle" data-size="2"></span>6 · Capstone</h4><a><span class="box"></span>…</a>
+    <h4><span data-sprite="dango" data-size="2"></span>3 · SSE</h4><a><span class="box"></span>3.1 Event format</a><a><span class="box"></span>…</a>
+    <h4><span data-sprite="sushi" data-size="2"></span>4 · WebSocket</h4><a><span class="box"></span>…</a>
+    <h4><span data-sprite="taiyaki" data-size="2"></span>5 · Webhooks</h4><a><span class="box"></span>…</a>
+    <h4><span data-sprite="bento" data-size="2"></span>6 · Capstone</h4><a><span class="box"></span>…</a>
   </nav>
 </template>
 
@@ -292,7 +292,7 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
       <label class="opt px">A. After ~1.0 s, when the whole response is ready</label>
       <label class="opt px right-ans">B. After ~0.1 s, at the first <code>yield</code> ✓</label>
       <label class="opt px">C. Immediately, before the generator starts</label>
-      <div class="bubble"><span data-sprite="cat" data-size="4"></span><div class="say px">Correct! <code>StreamingResponse</code> sends each chunk as it is yielded. Press <b>Run it</b> to see the timings.</div></div>
+      <div class="bubble"><span data-sprite="mascot" data-size="4"></span><div class="say px">Correct! <code>StreamingResponse</code> sends each chunk as it is yielded. Press <b>Run it</b> to see the timings.</div></div>
       <h3>Q2 · Is there a <code>Content-Length</code> header?</h3>
       <label class="opt px">A. Yes, FastAPI computes it</label>
       <label class="opt px">B. No, the length is unknown up front</label>
@@ -352,7 +352,7 @@ async def demo():
       <h3>Your task</h3>
       <div class="task px"><span class="label">Task</span>Fix the PR you reviewed: stream tokens from <code>fake_llm()</code> without blocking the event loop, and stop when the client disconnects.</div>
       <details class="fold px"><summary>Hints <span class="lock">1 of 3</span></summary><div class="body">1. Which call in the generator blocks the whole event loop? There is an async version of it.</div></details>
-      <details class="fold px"><summary>Best practice <span class="lock">🔒 unlocks on pass · open early</span></summary><div class="body">In production · Common mistakes · Trade-offs · What breaks at scale · Security & reliability · Observability</div></details>
+      <details class="fold px"><summary>Best practice <span class="lock">unlocks on pass · open early</span></summary><div class="body">In production · Common mistakes · Trade-offs · What breaks at scale · Security & reliability · Observability</div></details>
       <details class="fold px"><summary>Stretch: cap stream at 60 s <span class="lock">optional</span></summary><div class="body">…</div></details>
       <details class="fold px"><summary>Read more</summary><div class="body">FastAPI: Stream Data · Starlette: Responses · HTTPX: Streaming responses</div></details>
     </div>
@@ -418,75 +418,74 @@ await asyncio.sleep(0.1)</pre>
 
 <script>
 /* ---------- pixel sprites: one char = one pixel ---------- */
-const PAL={K:"#2b2420",B:"#96523a",O:"#ef8a62",Y:"#e0aa50",R:"#d63434",W:"#ffffff",G:"#5b6657",
-           C:"#f3e9d6",N:"#b07a4f",M:"#9fbf8a",P:"#f4a6a0"};
+const PAL={K:"#2b2420",N:"#c98a4b",B:"#8a5530",O:"#ef8a62",Y:"#f2c14e",R:"#c8453a",W:"#ffffff",
+           C:"#fff7e6",D:"#2f3b2f",M:"#8fb56f",P:"#f4a6b8",T:"#e9c98f",L:"#f7e2a8",E:"#f6d36b"};
+/* One food per module. One character = one pixel, "." = transparent. */
 const SPRITES={
-  bento:[
+  bento:[                 // logo + capstone: the whole box
     "KKKKKKKKKKKK",
-    "KCCCCKYYYYYK",
-    "KCCRCKYYYYYK",
+    "KCCCCKEEEEEK",
+    "KCCRCKEEEEEK",
     "KCCCCKKKKKKK",
     "KKKKKKMMOMMK",
     "KOOOOKMMMMMK",
     "KOOOOKMOMMMK",
     "KKKKKKKKKKKK"],
-  mascot:[            // the bento cat
-    ".N........N.",
-    "NNN......NNN",
-    "NNNNNNNNNNNN",
-    "NNNKNNNNKNNN",
-    "NNNNNNNNNNNN",
-    "PPNNNKKNNNPP",
-    "NNNNNNNNNNNN",
-    ".NNNNNNNNNN.",
-    "..K.K..K.K.."],
-  bird:[
-    "..WWW....",
-    "OOWWW....",
-    "..WWW....",
-    "..WWWWWW.",
-    "..WWWWWW.",
-    "...K.....",
-    "...K....."],
-  cat:[
-    "O.O......",
-    "OOO......",
-    "OOO....O.",
-    ".OOOO..O.",
-    ".OOOOO.O.",
-    ".OOOOOOO.",
-    ".OOOOOO.."],
-  dog:[
-    "..BBB.......B",
-    "KBBBKK......B",
-    "BBBBKKBBBBBBB",
-    "....KKBBBBBBB",
-    "....KKBBBBBBB",
-    ".....B....B..",
-    ".....B....B.."],
-  chicken:[
-    "..RR.....",
-    ".YY......",
-    "RYY......",
-    ".YYYYYYY.",
-    ".YYYYYY..",
-    "..YYYY...",
-    "....G....",
-    "....G...."],
-  rabbit:[
-    "..W.W....",
-    "..W.W....",
-    "..W.W....",
-    ".WWWWW...",
-    "BWWWWWWW.",
-    "..WWWWWW.",
-    ".WWWWWWWW"],
-  turtle:[
-    "...GGGG...",
-    "..GGGGGG..",
-    ".GGGGGGGG.",
-    "OOGGGGGGG.",
-    "..O....O.."]
+  mascot:[                // steamed bun with a face
+    ".....KK.....",
+    "...KKCCKK...",
+    "..KCCCCCCK..",
+    ".KCCCCCCCCK.",
+    ".KCCKCCKCCK.",
+    "KCPCCCCCCPCK",
+    "KCCCCKKCCCCK",
+    ".KKKKKKKKKK."],
+  onigiri:[               // 1 API basics
+    "....WW....",
+    "...WWWW...",
+    "..WWWWWW..",
+    "..WWWWWW..",
+    ".WWWWWWWW.",
+    ".WWDDDDWW.",
+    "WWWDDDDWWW",
+    "WWWDDDDWWW"],
+  ramen:[                 // 2 Streaming: noodles flow
+    "......B..B.",
+    ".....B..B..",
+    "TLLTOOTLYYT",
+    "RRRRRRRRRRR",
+    "RWRRWRRWRRR",
+    ".RRRRRRRRR.",
+    "..RRRRRRR..",
+    "...BBBBB..."],
+  dango:[                 // 3 SSE: one event after another
+    "..B..",
+    ".PPP.",
+    "PPPPP",
+    ".PPP.",
+    ".WWW.",
+    "WWWWW",
+    ".WWW.",
+    ".MMM.",
+    "MMMMM",
+    ".MMM.",
+    "..B..",
+    "..B.."],
+  sushi:[                 // 4 WebSocket
+    "...OOOOO...",
+    ".OOWOOWOOO.",
+    "OOOOOOOOOOO",
+    "WWWWDDWWWWW",
+    "WWWWDDWWWWW",
+    ".WWWDDWWWW."],
+  taiyaki:[               // 5 Webhooks: a fish on the hook
+    "....NNNN....",
+    "..NNNNNNN.N.",
+    ".NKNNBNBNNNN",
+    "NNNNNNNNNNN.",
+    ".NNNBNBNNNNN",
+    "..NNNNNNN.N.",
+    "....NNNN...."]
 };
 function sprite(name,size){
   const g=SPRITES[name],h=g.length,w=g[0].length;let r="";
