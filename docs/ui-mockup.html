@@ -25,6 +25,7 @@
   --code-bg:#2e2a24;--code-ink:#f1e7d3;--code-muted:#8a7d6a;--code-hl:#4a3a2c;
   --code-kw:#f0a070;--code-cm:#9fbf8a;
   --px:3px;
+  --hi:rgba(255,255,255,.6);--lo:rgba(74,59,44,.16);  /* 16-bit bevel */
   /* Pixel font only for big headings; everything you read is a clean sans. */
   --pixel:"Pixelify Sans",ui-monospace,monospace;
   --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -32,12 +33,14 @@
   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --hi:rgba(255,255,255,.07);--lo:rgba(0,0,0,.35);
   --bg:#231e19;--panel:#2f2822;--panel-2:#3a3129;--ink:#efe3cf;--muted:#a8977f;
   --accent:#f08a5d;--accent-soft:#4a3125;--mint:#34402f;--ok:#9cc48a;--ok-soft:#2f3d2a;
   --bad:#f08272;--bad-soft:#4a2620;--warn:#e8bd5f;--warn-soft:#45381c;--shadow:#16120e;
   --code-bg:#1b1814;
 }}
 :root[data-theme="dark"]{
+  --hi:rgba(255,255,255,.07);--lo:rgba(0,0,0,.35);
   --bg:#231e19;--panel:#2f2822;--panel-2:#3a3129;--ink:#efe3cf;--muted:#a8977f;
   --accent:#f08a5d;--accent-soft:#4a3125;--mint:#34402f;--ok:#9cc48a;--ok-soft:#2f3d2a;
   --bad:#f08272;--bad-soft:#4a2620;--warn:#e8bd5f;--warn-soft:#45381c;--shadow:#16120e;
@@ -77,6 +80,27 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
 .btn.primary{background:var(--accent);color:var(--accent-ink)}
 .btn.primary:hover{filter:brightness(1.05)}
 .btn small{font-size:11px;opacity:.85}
+
+/* 16-bit bevel: light top-left edge, dark bottom-right edge, inside the pixel border. */
+.bevel,.btn.px,.btn.px-drop,.mod.px,.step.px,.score .px,.opt.px{
+  box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink),
+    inset 3px 3px 0 0 var(--hi),inset -3px -3px 0 0 var(--lo);
+}
+.btn.px-drop{
+  box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink),
+    0 calc(3*var(--px)) 0 0 var(--shadow),
+    inset 3px 3px 0 0 var(--hi),inset -3px -3px 0 0 var(--lo);
+}
+.btn:active{box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink),
+    inset 3px 3px 0 0 var(--lo),inset -3px -3px 0 0 var(--hi)}
+.blocks i{box-shadow:inset 2px 2px 0 0 var(--hi),inset -2px -2px 0 0 var(--lo)}
+.side h4 svg.sprite{flex:none}
 .label{font-family:var(--label);font-size:14px;font-weight:700}
 
 /* ---------- mockup switcher ---------- */
@@ -107,7 +131,7 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
 .mod .name{font:700 13px var(--label);line-height:1.25}
 .mod .st{font-size:13px;color:var(--muted)}
 .mod.locked{cursor:default}
-.mod.locked .art{filter:grayscale(1) opacity(.35)}
+.mod.locked .art{filter:saturate(.35) opacity(.55)}
 .mod.cur{background:var(--accent-soft)}
 .continue{margin-top:22px;background:var(--panel);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 
@@ -206,13 +230,13 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
 <!-- HOME -->
 <section class="screen on" id="home">
   <div class="home">
-    <div class="brand"><span data-sprite="bento" data-size="5"></span><h1>bento-academy</h1></div>
+    <div class="brand"><span data-sprite="bento" data-size="3"></span><h1>bento-academy</h1></div>
     <p class="sub">Learn one small box at a time.</p>
 
     <div class="course px">
       <div class="head label">Course 1</div>
       <div class="body">
-        <span data-sprite="mascot" data-size="9"></span>
+        <span data-sprite="mascot" data-size="7"></span>
         <div>
           <h2>Backend for AI engineers</h2>
           <p>APIs, streaming, SSE, WebSocket, webhooks, and a capstone.</p>
@@ -226,12 +250,12 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
         </div>
       </div>
       <div class="modules">
-        <div class="mod px" data-go="fix"><div class="art"><span data-sprite="onigiri" data-size="5"></span></div><div class="name">API basics</div><div class="st">7/7 ✓</div></div>
-        <div class="mod px cur" data-go="fix"><div class="art"><span data-sprite="ramen" data-size="5"></span></div><div class="name">Streaming</div><div class="st">1/5</div></div>
-        <div class="mod px locked"><div class="art"><span data-sprite="dango" data-size="4"></span></div><div class="name">SSE</div><div class="st">0/5</div></div>
-        <div class="mod px locked"><div class="art"><span data-sprite="sushi" data-size="5"></span></div><div class="name">WebSocket</div><div class="st">0/6</div></div>
-        <div class="mod px locked"><div class="art"><span data-sprite="taiyaki" data-size="5"></span></div><div class="name">Webhooks</div><div class="st">0/6</div></div>
-        <div class="mod px locked"><div class="art"><span data-sprite="bento" data-size="4"></span></div><div class="name">Capstone</div><div class="st">0/5</div></div>
+        <div class="mod px" data-go="fix"><div class="art"><span data-sprite="onigiri" data-size="3"></span></div><div class="name">API basics</div><div class="st">7/7 ✓</div></div>
+        <div class="mod px cur" data-go="fix"><div class="art"><span data-sprite="ramen" data-size="3"></span></div><div class="name">Streaming</div><div class="st">1/5</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="dango" data-size="3"></span></div><div class="name">SSE</div><div class="st">0/5</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="sushi" data-size="3"></span></div><div class="name">WebSocket</div><div class="st">0/6</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="taiyaki" data-size="3"></span></div><div class="name">Webhooks</div><div class="st">0/6</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="bento" data-size="3"></span></div><div class="name">Capstone</div><div class="st">0/5</div></div>
       </div>
     </div>
 
@@ -258,7 +282,7 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
 </template>
 <template id="side">
   <nav class="side">
-    <h4><span data-sprite="onigiri" data-size="2"></span>1 · API basics</h4>
+    <h4><span data-sprite="onigiri" data-size="1"></span>1 · API basics</h4>
     <a><span class="box done">✓</span>1.1 Methods & status codes</a>
     <a><span class="box done">✓</span>1.2 Pydantic models</a>
     <a><span class="box done">✓</span>1.3 Async vs sync</a>
@@ -267,17 +291,17 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
     <a><span class="box done">✓</span>1.6 Pagination</a>
     <a><span class="box done">✓</span>1.7 Auth: API key & JWT</a>
     <a class="quiz"><span class="box done">✓</span>Quiz · Design question</a>
-    <h4><span data-sprite="ramen" data-size="2"></span>2 · Streaming</h4>
+    <h4><span data-sprite="ramen" data-size="1"></span>2 · Streaming</h4>
     <a><span class="box done">✓</span>2.1 Generators</a>
     <a class="cur"><span class="box"></span>2.2 StreamingResponse</a>
     <a><span class="box"></span>2.3 Chunked transfer</a>
     <a><span class="box"></span>2.4 Backpressure</a>
     <a><span class="box"></span>2.5 Client disconnects</a>
     <a class="quiz"><span class="box"></span>Quiz · Design question</a>
-    <h4><span data-sprite="dango" data-size="2"></span>3 · SSE</h4><a><span class="box"></span>3.1 Event format</a><a><span class="box"></span>…</a>
-    <h4><span data-sprite="sushi" data-size="2"></span>4 · WebSocket</h4><a><span class="box"></span>…</a>
-    <h4><span data-sprite="taiyaki" data-size="2"></span>5 · Webhooks</h4><a><span class="box"></span>…</a>
-    <h4><span data-sprite="bento" data-size="2"></span>6 · Capstone</h4><a><span class="box"></span>…</a>
+    <h4><span data-sprite="dango" data-size="1"></span>3 · SSE</h4><a><span class="box"></span>3.1 Event format</a><a><span class="box"></span>…</a>
+    <h4><span data-sprite="sushi" data-size="1"></span>4 · WebSocket</h4><a><span class="box"></span>…</a>
+    <h4><span data-sprite="taiyaki" data-size="1"></span>5 · Webhooks</h4><a><span class="box"></span>…</a>
+    <h4><span data-sprite="bento" data-size="1"></span>6 · Capstone</h4><a><span class="box"></span>…</a>
   </nav>
 </template>
 
@@ -292,7 +316,7 @@ svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
       <label class="opt px">A. After ~1.0 s, when the whole response is ready</label>
       <label class="opt px right-ans">B. After ~0.1 s, at the first <code>yield</code> ✓</label>
       <label class="opt px">C. Immediately, before the generator starts</label>
-      <div class="bubble"><span data-sprite="mascot" data-size="4"></span><div class="say px">Correct! <code>StreamingResponse</code> sends each chunk as it is yielded. Press <b>Run it</b> to see the timings.</div></div>
+      <div class="bubble"><span data-sprite="mascot" data-size="3"></span><div class="say px">Correct! <code>StreamingResponse</code> sends each chunk as it is yielded. Press <b>Run it</b> to see the timings.</div></div>
       <h3>Q2 · Is there a <code>Content-Length</code> header?</h3>
       <label class="opt px">A. Yes, FastAPI computes it</label>
       <label class="opt px">B. No, the length is unknown up front</label>
@@ -394,7 +418,7 @@ async def demo():
       <p>Why might you choose NDJSON over SSE for an internal service-to-service token stream?</p>
       <details class="fold px"><summary>Reveal model answer</summary><div class="body">…</div></details>
       <div class="win px">
-        <span data-sprite="mascot" data-size="5"></span>
+        <span data-sprite="mascot" data-size="3"></span>
         <div style="flex:1"><span class="label">Lesson complete!</span><br>✓ Predict · ✓ Review 2/3 · ✓ Tests · ✓ Prove</div>
         <button class="btn primary px-drop">Next lesson ▸</button>
       </div>
@@ -418,74 +442,122 @@ await asyncio.sleep(0.1)</pre>
 
 <script>
 /* ---------- pixel sprites: one char = one pixel ---------- */
-const PAL={K:"#2b2420",N:"#c98a4b",B:"#8a5530",O:"#ef8a62",Y:"#f2c14e",R:"#c8453a",W:"#ffffff",
-           C:"#fff7e6",D:"#2f3b2f",M:"#8fb56f",P:"#f4a6b8",T:"#e9c98f",L:"#f7e2a8",E:"#f6d36b"};
-/* One food per module. One character = one pixel, "." = transparent. */
+const PAL={
+  K:"#3b2a20",                         // outline
+  W:"#ffffff",w:"#e6dccb",             // rice / white + shade
+  D:"#2f3b2f",d:"#4f6352",             // nori + highlight
+  R:"#c8453a",r:"#9b2f27",h:"#e8735f", // lacquer red: base, shadow, highlight
+  T:"#e9b866",L:"#f7e2a8",             // broth, noodles
+  Y:"#f5c542",y:"#d9a21f",             // yolk / tamago + shade
+  P:"#f4a6b8",p:"#d97a93",             // pink + shade
+  M:"#8fb56f",m:"#5f8a45",             // green + shade
+  O:"#f28c5c",o:"#d0663a",S:"#ffd8c4", // salmon base, shade, fat stripe
+  N:"#d9984f",n:"#a8692c",             // baked batter + shade
+  B:"#8a5530",                         // wood
+  C:"#fff7e6",c:"#ead7b6"              // bun dough + shade
+};
+/* 16-bit style: 16px grid, outline, 2-3 shades per colour. "." = transparent. */
 const SPRITES={
-  bento:[                 // logo + capstone: the whole box
-    "KKKKKKKKKKKK",
-    "KCCCCKEEEEEK",
-    "KCCRCKEEEEEK",
-    "KCCCCKKKKKKK",
-    "KKKKKKMMOMMK",
-    "KOOOOKMMMMMK",
-    "KOOOOKMOMMMK",
-    "KKKKKKKKKKKK"],
-  mascot:[                // steamed bun with a face
-    ".....KK.....",
-    "...KKCCKK...",
-    "..KCCCCCCK..",
-    ".KCCCCCCCCK.",
-    ".KCCKCCKCCK.",
-    "KCPCCCCCCPCK",
-    "KCCCCKKCCCCK",
-    ".KKKKKKKKKK."],
-  onigiri:[               // 1 API basics
-    "....WW....",
-    "...WWWW...",
-    "..WWWWWW..",
-    "..WWWWWW..",
-    ".WWWWWWWW.",
-    ".WWDDDDWW.",
-    "WWWDDDDWWW",
-    "WWWDDDDWWW"],
-  ramen:[                 // 2 Streaming: noodles flow
-    "......B..B.",
-    ".....B..B..",
-    "TLLTOOTLYYT",
-    "RRRRRRRRRRR",
-    "RWRRWRRWRRR",
-    ".RRRRRRRRR.",
-    "..RRRRRRR..",
-    "...BBBBB..."],
-  dango:[                 // 3 SSE: one event after another
-    "..B..",
-    ".PPP.",
-    "PPPPP",
-    ".PPP.",
-    ".WWW.",
-    "WWWWW",
-    ".WWW.",
-    ".MMM.",
-    "MMMMM",
-    ".MMM.",
-    "..B..",
-    "..B.."],
-  sushi:[                 // 4 WebSocket
-    "...OOOOO...",
-    ".OOWOOWOOO.",
-    "OOOOOOOOOOO",
-    "WWWWDDWWWWW",
-    "WWWWDDWWWWW",
-    ".WWWDDWWWW."],
-  taiyaki:[               // 5 Webhooks: a fish on the hook
-    "....NNNN....",
-    "..NNNNNNN.N.",
-    ".NKNNBNBNNNN",
-    "NNNNNNNNNNN.",
-    ".NNNBNBNNNNN",
-    "..NNNNNNN.N.",
-    "....NNNN...."]
+  onigiri:[
+    "................",
+    ".......KK.......",
+    "......KWWK......",
+    ".....KWWWWK.....",
+    "....KWWWWWWK....",
+    "....KWWWWWwK....",
+    "...KWWWWWWwwK...",
+    "...KWWWWWWWwK...",
+    "..KWWWWWWWWwwK..",
+    "..KWWWDDDDWWwK..",
+    ".KWWWWDdDDWWwwK.",
+    ".KWWWWDdDDWWWwK.",
+    "KWWWWWDdDDWWWwwK",
+    "KwWWWWDDDDWWWwwK",
+    ".KwwwwDDDDwwwwK.",
+    "..KKKKKKKKKKKK.."],
+  ramen:[
+    "..........B..B..",
+    ".........B..B...",
+    "........B..B....",
+    "..KKKKKKKKKKKK..",
+    ".KLLTMTPPTWWTLK.",
+    "KTLLTMPpPTWYYWTK",
+    "KhRRRRRRRRRRRRrK",
+    "KhRRWRRRWRRRWRrK",
+    ".KhRRRRRRRRRRrK.",
+    ".KhRRRRRRRRRRrK.",
+    "..KRRRRRRRRRrK..",
+    "...KKrrrrrrKK...",
+    "....KBBBBBBK....",
+    "....KKKKKKKK....",
+    "................",
+    "................"],
+  dango:[
+    "....BB....",
+    "..KKKKKK..",
+    ".KPWPPPpK.",
+    ".KPPPPPpK.",
+    "..KppppK..",
+    "..KKKKKK..",
+    ".KWWWWWwK.",
+    ".KWWWWWwK.",
+    "..KwwwwK..",
+    "..KKKKKK..",
+    ".KMWMMMmK.",
+    ".KMMMMMmK.",
+    "..KmmmmK..",
+    "...KBBK...",
+    "....BB....",
+    "....BB...."],
+  sushi:[
+    "...KKKKKKKKKK...",
+    "..KOOSOOOSOOOK..",
+    ".KOOOSOOOSOOOoK.",
+    "KoOOOOSOOOSOOooK",
+    "KWWWWWWDDWWWWWwK",
+    "KWWWWWWDdWWWWwwK",
+    "KwWWWWWDDWWWWwwK",
+    ".KwwwwwDDwwwwwK.",
+    "..KKKKKKKKKKKK.."],
+  taiyaki:[
+    ".....KKKKKK.....",
+    "...KKNNNNNNKK.KK",
+    "..KNYYNNnNNNNKNK",
+    ".KNYKNNNnNnNNNNK",
+    "KNNNNNNnNnNnNNnK",
+    "KNNNNnNnNnNnNNNK",
+    ".KnNNNNNnNnNNNnK",
+    "..KnnNNNNNNNnKnK",
+    "...KKnnnnnnnKK.K",
+    ".....KKKKKKK...."],
+  bento:[
+    "KKKKKKKKKKKKKKKK",
+    "KhRRRRRRRRRRRRrK",
+    "KRKKKKKKKKKKKKrK",
+    "KRKWWWWWKYYYYKrK",
+    "KRKWWPWWKYyYYKrK",
+    "KRKWWWWWKYYYyKrK",
+    "KRKWWWWWKKKKKKrK",
+    "KRKKKKKKKMMmMKrK",
+    "KRKOOoOOKMmMMKrK",
+    "KRKOOOoOKMMMmKrK",
+    "KRKKKKKKKKKKKKrK",
+    "KrrrrrrrrrrrrrrK",
+    "KKKKKKKKKKKKKKKK"],
+  mascot:[
+    ".......KK.......",
+    "......KcCK......",
+    "....KKCCCCKK....",
+    "...KCCCCCCCCK...",
+    "..KCCCCCCCCCCK..",
+    ".KCCCCCCCCCCCcK.",
+    ".KCCCKCCCCKCCcK.",
+    "KCCCCKCCCCKCCCcK",
+    "KCPPCCCKKCCCPPcK",
+    "KCCCCCCCCCCCCccK",
+    "KcCCCCCCCCCCcccK",
+    ".KccccccccccccK.",
+    "..KKKKKKKKKKKK.."]
 };
 function sprite(name,size){
   const g=SPRITES[name],h=g.length,w=g[0].length;let r="";
