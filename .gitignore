@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+/exercises/
+/progress.json
+/.bento/
+/app/vendor/

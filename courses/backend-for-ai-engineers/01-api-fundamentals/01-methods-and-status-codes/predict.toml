@@ -1,0 +1,24 @@
+intro = "Read `snippet.py` on the right. Pick your answers first, then press **Run it** to check."
+snippet = "predict/snippet.py"
+
+[[questions]]
+prompt = "**Q1.** `POST /notes` has no `status_code` set. What status does the client get?"
+options = ["`201 Created`, because it's a POST", "`200 OK`", "`204 No Content`"]
+answer = 1
+explain = "FastAPI uses `200` unless you set `status_code=` on the decorator. It never infers 201 from the method."
+
+[[questions]]
+prompt = "**Q2.** `GET /notes/7` asks for a note that doesn't exist. What comes back?"
+options = ["`404 Not Found`", "`500 Internal Server Error`", "`200 OK` with the body `null`"]
+answer = 2
+explain = "`dict.get` returns `None`, FastAPI serialises it as `null`, and the status is still the default `200`. Nothing raised an error, so nothing told the client the note is missing."
+
+[[questions]]
+prompt = "**Q3.** The second `DELETE /notes/1` returns `404`. Is this DELETE still idempotent?"
+options = [
+  "No: the response changed, so it isn't idempotent",
+  "Yes: idempotency is about the effect on the server, not the response",
+  "Only if it returns `204` both times",
+]
+answer = 1
+explain = "After one DELETE or ten, note 1 is gone: same effect. MDN's own example of an idempotent DELETE returns 200, then 404."

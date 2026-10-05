@@ -1,0 +1,5 @@
+id = "sse"
+title = "Server-Sent Events"
+short = "SSE"
+icon = "dango"
+summary = "The event format, EventSource, reconnect with Last-Event-ID, streaming LLM tokens."

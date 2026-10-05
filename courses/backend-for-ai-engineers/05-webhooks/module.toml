@@ -1,0 +1,5 @@
+id = "webhooks"
+title = "Webhooks"
+short = "Webhooks"
+icon = "taiyaki"
+summary = "Receiving, HMAC signatures, idempotency, fast acks, retries, sending webhooks."

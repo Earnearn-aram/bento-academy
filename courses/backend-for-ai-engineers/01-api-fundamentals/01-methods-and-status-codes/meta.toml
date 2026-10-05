@@ -1,0 +1,68 @@
+id = "methods-and-status-codes"
+title = "Methods & status codes"
+summary = "Make a small resource API say exactly what happened, using the right method and status code."
+minutes = 25
+version = 1
+files = ["main.py"]
+prove_file = "test_prove.py"
+
+[[sources]]
+title = "MDN: HTTP request methods (safe / idempotent table)"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods"
+
+[[sources]]
+title = "MDN Glossary: Idempotent"
+url = "https://developer.mozilla.org/en-US/docs/Glossary/Idempotent"
+
+[[sources]]
+title = "MDN Glossary: Safe (HTTP methods)"
+url = "https://developer.mozilla.org/en-US/docs/Glossary/Safe/HTTP"
+
+[[sources]]
+title = "MDN: HTTP response status codes"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status"
+
+[[sources]]
+title = "MDN: 201 Created"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/201"
+
+[[sources]]
+title = "MDN: 204 No Content"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/204"
+
+[[sources]]
+title = "MDN: 409 Conflict"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"
+
+[[sources]]
+title = "MDN: 422 Unprocessable Content"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"
+
+[[sources]]
+title = "MDN: DELETE"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/DELETE"
+
+[[sources]]
+title = "MDN: Location header"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location"
+
+[[sources]]
+title = "FastAPI: Response Status Code"
+url = "https://fastapi.tiangolo.com/tutorial/response-status-code/"
+
+[[sources]]
+title = "FastAPI: Response Headers"
+url = "https://fastapi.tiangolo.com/advanced/response-headers/"
+
+[[sources]]
+title = "FastAPI: Handling Errors"
+url = "https://fastapi.tiangolo.com/tutorial/handling-errors/"
+
+[[sources]]
+title = "FastAPI: Testing"
+url = "https://fastapi.tiangolo.com/tutorial/testing/"
+
+[[sources]]
+title = "Starlette: TestClient"
+url = "https://www.starlette.io/testclient/"
+note = "Starlette 1.7 builds TestClient on httpx2; plain httpx still works but is deprecated."
