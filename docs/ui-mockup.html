@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bento-academy UI mockup</title>
+<style>
+:root{
+  --bg:#f6f5f2;--panel:#ffffff;--ink:#1d1d1f;--muted:#6b6b70;--line:#e3e1dc;
+  --accent:#c2410c;--accent-soft:#fff1e8;--ok:#15803d;--ok-soft:#e8f6ed;
+  --bad:#b91c1c;--bad-soft:#fdecec;--warn:#a16207;--warn-soft:#fdf6e3;
+  --code-bg:#1e1e24;--code-ink:#e6e6e6;--code-muted:#7d7d88;--code-hl:#3a2a20;
+  --radius:10px;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#141417;--panel:#1c1c20;--ink:#ececf0;--muted:#9a9aa3;--line:#2c2c33;
+  --accent:#fb923c;--accent-soft:#2a1d14;--ok:#4ade80;--ok-soft:#14261b;
+  --bad:#f87171;--bad-soft:#2b1717;--warn:#facc15;--warn-soft:#2a2410;
+}}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 12px}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button:hover{border-color:var(--accent)}
+code,pre{font-family:var(--mono)}
+.mock-nav{display:flex;gap:8px;padding:8px 16px;background:var(--ink);color:var(--bg);font-size:13px;align-items:center;flex-wrap:wrap}
+.mock-nav button{background:transparent;color:var(--bg);border-color:#555;padding:3px 10px;font-size:13px}
+.mock-nav button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.screen{display:none}.screen.on{display:block}
+
+/* home */
+.home{max-width:960px;margin:0 auto;padding:32px 16px}
+.home h1{margin:0 0 4px;font-size:28px}
+.home .sub{color:var(--muted);margin:0 0 24px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;cursor:pointer}
+.card:hover{border-color:var(--accent)}
+.card h3{margin:0 0 4px}.card p{margin:0 0 12px;color:var(--muted);font-size:14px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:6px}
+.card.empty{border-style:dashed;cursor:default;display:flex;align-items:center;justify-content:center;color:var(--muted);min-height:140px;text-align:center}
+.continue{margin-top:24px;background:var(--accent-soft);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* lesson layout */
+.top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.crumbs{color:var(--muted);font-size:14px}.crumbs b{color:var(--ink)}
+.top .spacer{flex:1}
+.steps{display:flex;gap:4px;flex-wrap:wrap}
+.step{font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--panel)}
+.step.done{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+.step.cur{color:#fff;background:var(--accent);border-color:var(--accent)}
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr) minmax(0,1.15fr);height:calc(100vh - 100px)}
+.side{border-right:1px solid var(--line);overflow:auto;padding:12px;background:var(--panel)}
+.side h4{margin:14px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.side a{display:flex;gap:8px;align-items:center;padding:5px 8px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:14px}
+.side a:hover{background:var(--bg)}.side a.cur{background:var(--accent-soft);font-weight:600}
+.dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:10px}
+.dot.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.side .quiz{color:var(--muted)}
+.left{overflow:auto;padding:20px 24px;border-right:1px solid var(--line)}
+.left h2{margin:0 0 8px;font-size:22px}
+.left h3{margin:20px 0 6px;font-size:16px}
+.left p{margin:0 0 10px}
+.ex{background:var(--code-bg);color:var(--code-ink);padding:12px;border-radius:8px;font-size:13px;overflow:auto}
+.task{background:var(--accent-soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:6px}
+.fold{border:1px solid var(--line);border-radius:8px;margin:10px 0;background:var(--panel)}
+.fold summary{padding:10px 14px;cursor:pointer;font-weight:600}
+.fold .body{padding:0 14px 12px;font-size:14px}
+.lock{font-size:12px;color:var(--muted);font-weight:400;margin-left:6px}
+.right{display:flex;flex-direction:column;min-height:0}
+.tool{display:flex;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel);align-items:center;flex-wrap:wrap}
+.tool .file{font-family:var(--mono);font-size:13px;color:var(--muted);margin-right:auto}
+.sync{font-size:12px;color:var(--ok)}
+.editor{flex:1;background:var(--code-bg);color:var(--code-ink);font:13px/1.6 var(--mono);overflow:auto;padding:10px 0;min-height:0}
+.ln{display:flex;white-space:pre}
+.ln .n{width:44px;text-align:right;padding-right:12px;color:var(--code-muted);user-select:none;flex:none}
+.ln.hl{background:var(--code-hl)}
+.ln .cm{color:#8fbf7f}.ln .kw{color:#c792ea}.ln .st{color:#f0c674}
+.review .ln{cursor:pointer}.review .ln:hover .n{color:var(--accent)}
+.review .ln.flag .n::before{content:"● ";color:var(--accent)}
+.results{border-top:1px solid var(--line);background:var(--panel);max-height:40%;overflow:auto;padding:10px 14px}
+.results h4{margin:0 0 8px;display:flex;justify-content:space-between;font-size:14px}
+.chk{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.chk:last-child{border:0}
+.chk .ic{flex:none;width:20px;text-align:center;font-weight:700}
+.chk.pass .ic{color:var(--ok)}.chk.fail .ic{color:var(--bad)}
+.chk small{display:block;color:var(--muted)}
+.tag{font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);margin-left:6px;color:var(--muted)}
+.tag.bp{border-color:var(--accent);color:var(--accent)}
+.comment{margin:4px 12px 8px 56px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:13px/1.4 system-ui,sans-serif;white-space:normal}
+.comment .row{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.comment select,.comment textarea{font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px}
+.comment textarea{width:100%;min-height:44px}
+.sev-blocker{color:var(--bad)}.sev-major{color:var(--warn)}
+.score{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.score div{background:var(--bg);border-radius:8px;padding:8px;text-align:center;font-size:13px;color:var(--muted)}
+.score b{display:block;font-size:20px;color:var(--ink)}
+.pr{font-size:13px;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
+.pr b{color:var(--ink)}
+.badge{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--warn-soft);color:var(--warn);margin-left:6px}
+.opt{display:block;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:6px 0;cursor:pointer;background:var(--panel)}
+.opt.right-ans{border-color:var(--ok);background:var(--ok-soft)}
+.note{font-size:13px;color:var(--muted)}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;height:auto}
+  .side{display:none}
+  .left{border-right:0;border-bottom:1px solid var(--line)}
+  .editor{min-height:360px}
+}
+</style>
+</head>
+<body>
+
+<div class="mock-nav">
+  <span>Mockup, click to switch screens:</span>
+  <button data-s="home" class="on">1 Home</button>
+  <button data-s="predict">2 Predict</button>
+  <button data-s="review">3 Review PR</button>
+  <button data-s="fix">4 Fix + Run tests</button>
+  <button data-s="defend">5 Defend</button>
+</div>
+
+<!-- HOME -->
+<section class="screen on" id="home">
+  <div class="home">
+    <h1>🍱 bento-academy</h1>
+    <p class="sub">Learn one small box at a time.</p>
+    <div class="cards">
+      <div class="card" data-go="fix">
+        <h3>Backend for AI engineers</h3>
+        <p>APIs, streaming, SSE, WebSocket, webhooks, and a capstone.</p>
+        <div class="bar"><i style="width:18%"></i></div>
+        <div class="meta"><span>6 of 34 lessons</span><span>Module 2 of 6</span></div>
+      </div>
+      <div class="card empty">Add a course by dropping a folder into <code>courses/</code></div>
+    </div>
+    <div class="continue">
+      <span>Continue where you left off: <b>2.2 StreamingResponse</b>, step Fix</span>
+      <button class="primary" data-go="fix">Continue →</button>
+    </div>
+  </div>
+</section>
+
+<!-- shared lesson chrome is duplicated per screen for a static mockup -->
+<template id="chrome">
+  <div class="top">
+    <span class="crumbs">Backend for AI engineers › Streaming › <b>2.2 StreamingResponse</b></span>
+    <span class="spacer"></span>
+    <div class="steps">
+      <span class="step" data-k="concept">Concept</span>
+      <span class="step" data-k="predict">Predict</span>
+      <span class="step" data-k="review">Review</span>
+      <span class="step" data-k="fix">Fix</span>
+      <span class="step" data-k="prove">Prove</span>
+      <span class="step" data-k="defend">Defend</span>
+    </div>
+  </div>
+</template>
+<template id="side">
+  <nav class="side">
+    <h4>1 · API fundamentals</h4>
+    <a><span class="dot done">✓</span>1.1 Methods & status codes</a>
+    <a><span class="dot done">✓</span>1.2 Pydantic models</a>
+    <a><span class="dot done">✓</span>1.3 Async vs sync</a>
+    <a><span class="dot done">✓</span>1.4 Timeouts & retries</a>
+    <a><span class="dot done">✓</span>1.5 Error handling</a>
+    <a><span class="dot done">✓</span>1.6 Pagination</a>
+    <a><span class="dot"></span>1.7 Auth: API key & JWT</a>
+    <a class="quiz"><span class="dot"></span>Quiz · Design question</a>
+    <h4>2 · Streaming</h4>
+    <a><span class="dot done">✓</span>2.1 Generators</a>
+    <a class="cur"><span class="dot"></span>2.2 StreamingResponse</a>
+    <a><span class="dot"></span>2.3 Chunked transfer</a>
+    <a><span class="dot"></span>2.4 Backpressure</a>
+    <a><span class="dot"></span>2.5 Client disconnects</a>
+    <a class="quiz"><span class="dot"></span>Quiz · Design question</a>
+    <h4>3 · SSE</h4><a><span class="dot"></span>3.1 Event format</a><a><span class="dot"></span>…</a>
+    <h4>4 · WebSocket</h4><a><span class="dot"></span>…</a>
+    <h4>5 · Webhooks</h4><a><span class="dot"></span>…</a>
+    <h4>6 · Capstone</h4><a><span class="dot"></span>…</a>
+  </nav>
+</template>
+
+<!-- PREDICT -->
+<section class="screen" id="predict" data-step="predict">
+  <div class="layout">
+    <div data-side></div>
+    <div class="left">
+      <h2>Predict</h2>
+      <p class="note">Read the code on the right. Answer before you run it.</p>
+      <h3>Q1. The client reads the stream as it arrives. When does it see the first token?</h3>
+      <label class="opt">A. After ~1.0 s, when the whole response is ready</label>
+      <label class="opt right-ans">B. After ~0.1 s, the first <code>yield</code> ✓</label>
+      <label class="opt">C. Immediately, before the generator starts</label>
+      <p class="note">✓ Correct. <code>StreamingResponse</code> sends each chunk as the generator yields it. Click <b>Run it</b> to see the timings.</p>
+      <h3>Q2. Does the response have a <code>Content-Length</code> header?</h3>
+      <label class="opt">A. Yes, FastAPI computes it</label>
+      <label class="opt">B. No, the length is unknown up front</label>
+    </div>
+    <div class="right">
+      <div class="tool"><span class="file">predict/snippet.py (read-only)</span><button class="primary">▶ Run it</button></div>
+      <div class="editor" data-code="predict"></div>
+      <div class="results"><h4>Output</h4><pre style="margin:0;font-size:13px">t=0.10s  b'tok0 '
+t=0.20s  b'tok1 '
+…
+t=1.00s  b'tok9 '</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEW -->
+<section class="screen" id="review" data-step="review">
+  <div class="layout">
+    <div data-side></div>
+    <div class="left">
+      <h2>Review the PR</h2>
+      <p>An AI agent opened this PR: <i>“Add /chat/stream endpoint that streams LLM tokens.”</i> The tests it wrote pass. Would you merge it?</p>
+      <p class="note">Click a line number to leave a comment. Pick severity and category, and say why in one line.</p>
+      <div class="task">Find the blockers. You can leave as many comments as you want; comments on correct code count against precision.</div>
+      <h3>Your review</h3>
+      <div class="score">
+        <div><b>2 / 3</b>blockers found</div>
+        <div><b>1 / 2</b>majors found</div>
+        <div><b>1</b>false alarm</div>
+      </div>
+      <details class="fold"><summary>Missed: line 13 — blocker</summary><div class="body">The generator never stops when the client disconnects. Each abandoned tab keeps billing LLM tokens. Fix: catch cancellation and close the upstream stream in <code>finally</code>.</div></details>
+      <details class="fold"><summary>Model review (how a Lead would write it)</summary><div class="body">Blocking: <code>time.sleep</code> inside an async generator stalls the event loop for every user…</div></details>
+      <button class="primary" style="margin-top:8px">Submit review</button>
+      <button>Next: fix it →</button>
+    </div>
+    <div class="right review">
+      <div class="pr"><b>PR #12</b> by <b>ai-agent</b><span class="badge">AI-generated</span> · app/chat.py · +24 −0</div>
+      <div class="editor" data-code="review"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FIX -->
+<section class="screen" id="fix" data-step="fix">
+  <div class="layout">
+    <div data-side></div>
+    <div class="left">
+      <h2>2.2 StreamingResponse</h2>
+      <p>A normal response is built in full, then sent. A <b>streaming</b> response is sent piece by piece while your code is still producing it. In FastAPI you return a <code>StreamingResponse</code> wrapping a generator; each <code>yield</code> becomes one chunk on the wire…</p>
+      <h3>Worked example</h3>
+      <pre class="ex">async def tokens():
+    for t in ["Hel", "lo"]:
+        yield t.encode()
+
+@app.get("/demo")
+async def demo():
+    return StreamingResponse(tokens(), media_type="text/plain")</pre>
+      <h3>Your task</h3>
+      <div class="task">Fix the PR you reviewed: stream tokens from <code>fake_llm()</code> without blocking the event loop, and stop generating when the client disconnects.</div>
+      <details class="fold"><summary>Hints (1 of 3 shown)</summary><div class="body">1. Which call in the generator blocks the whole event loop? There is an async version of it.</div></details>
+      <details class="fold"><summary>Best practice <span class="lock">unlocks when tests pass · open early</span></summary><div class="body">
+        <b>In production</b> · <b>Common mistakes</b> · <b>Trade-offs</b> · <b>What breaks at scale</b> · <b>Security & reliability</b> · <b>Observability</b>
+      </div></details>
+      <details class="fold"><summary>Stretch: cap stream duration at 60 s <span class="lock">optional · own tests</span></summary><div class="body">…</div></details>
+      <details class="fold"><summary>Read more</summary><div class="body">FastAPI: Stream Data · Starlette: Responses · HTTPX: Streaming responses</div></details>
+    </div>
+    <div class="right">
+      <div class="tool">
+        <span class="file">exercises/…/02-streaming-response/main.py</span>
+        <span class="sync">● synced with disk</span>
+        <button class="primary">▶ Run tests <small>Ctrl+Enter</small></button>
+        <button>Hint</button><button>Show solution</button><button>Reset</button>
+      </div>
+      <div class="editor" data-code="fix"></div>
+      <div class="results">
+        <h4><span>Tests · 3 of 4 passed</span><span class="note">0.9 s</span></h4>
+        <div class="chk pass"><span class="ic">✓</span><div>Endpoint returns 200 with text/plain</div></div>
+        <div class="chk pass"><span class="ic">✓</span><div>Tokens arrive in more than one chunk</div></div>
+        <div class="chk pass"><span class="ic">✓</span><div>First chunk arrives before the stream ends <span class="tag bp">best practice</span></div></div>
+        <div class="chk fail"><span class="ic">✗</span><div>Generator stops after the client disconnects <span class="tag bp">best practice</span>
+          <small>Expected the fake LLM to stop within 0.5 s of disconnect; it produced all 50 tokens. Hint: wrap the loop in try/finally.</small>
+          <small><a href="#" style="color:var(--muted)">Show details</a></small></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEFEND -->
+<section class="screen" id="defend" data-step="defend">
+  <div class="layout">
+    <div data-side></div>
+    <div class="left">
+      <h2>Defend it</h2>
+      <p class="note">Answer out loud or in the box, then reveal the model answer.</p>
+      <h3>Interview 1</h3>
+      <p>Your streaming endpoint works locally but users behind the company proxy get the whole answer at once after 20 s. Walk me through how you'd debug it and what you'd change.</p>
+      <textarea style="width:100%;min-height:90px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit" placeholder="Your answer…"></textarea>
+      <details class="fold"><summary>Reveal model answer</summary><div class="body">Suspect buffering by an intermediary…</div></details>
+      <h3>Interview 2</h3>
+      <p>Why might you choose NDJSON over SSE for an internal service-to-service token stream?</p>
+      <details class="fold"><summary>Reveal model answer</summary><div class="body">…</div></details>
+      <h3>Lesson complete</h3>
+      <p>✓ Predict · ✓ Review (2/3 blockers) · ✓ Tests · ✓ Prove · <button class="primary">Next lesson →</button></p>
+    </div>
+    <div class="right">
+      <div class="tool"><span class="file">Best practice</span></div>
+      <div class="left" style="border:0">
+        <h3>In production</h3><p>Behind nginx or a CDN, disable response buffering for streaming routes…</p>
+        <h3>Common mistakes</h3>
+        <pre class="ex"># ✗ blocks every user
+time.sleep(0.1)
+# ✓
+await asyncio.sleep(0.1)</pre>
+        <h3>Trade-offs</h3><p>Plain streaming vs SSE vs WebSocket…</p>
+        <h3>What breaks at scale</h3><p>One open connection per user per worker…</p>
+        <h3>Observability</h3><p>Log time-to-first-token, tokens/s, and disconnect reason…</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+const code = {
+predict:`from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+import asyncio
+
+app = FastAPI()
+
+async def tokens():
+    for i in range(10):
+        await asyncio.sleep(0.1)
+        yield f"tok{i} ".encode()
+
+@app.get("/stream")
+async def stream():
+    return StreamingResponse(tokens(), media_type="text/plain")`,
+review:`import time
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from .llm import fake_llm
+
+app = FastAPI()
+
+def log(msg):
+    print(msg)
+
+async def gen(prompt: str):
+    log(f"prompt={prompt}")
+    for tok in fake_llm(prompt):
+        time.sleep(0.05)  # pace the output
+        yield tok
+
+@app.get("/chat/stream")
+async def chat_stream(prompt: str):
+    # stream the answer back to the user
+    return StreamingResponse(gen(prompt))`,
+fix:`import asyncio
+from fastapi import FastAPI, Request
+from fastapi.responses import StreamingResponse
+from shared.fake_llm import fake_llm
+
+app = FastAPI()
+
+async def gen(request: Request, prompt: str):
+    # TODO: don't block the event loop
+    # TODO: stop when the client disconnects
+    async for tok in fake_llm(prompt):
+        yield tok.encode()
+
+@app.get("/chat/stream")
+async def chat_stream(request: Request, prompt: str):
+    return StreamingResponse(gen(request, prompt), media_type="text/plain")`};
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function paint(src){
+  return esc(src).split("\n").map((l,i)=>{
+    l=l.replace(/(#.*)$/,'<span class="cm">$1</span>')
+       .replace(/\b(import|from|async|def|await|for|in|return|yield)\b/g,'<span class="kw">$1</span>');
+    return `<div class="ln" data-l="${i+1}"><span class="n">${i+1}</span><span>${l}</span></div>`;
+  }).join("");
+}
+document.querySelectorAll("[data-code]").forEach(el=>el.innerHTML=paint(code[el.dataset.code]));
+// pre-filled review comments
+const rv=document.querySelector('#review [data-code]');
+function addComment(line,sev,cat,text){
+  const ln=rv.querySelector(`[data-l="${line}"]`);ln.classList.add("flag");
+  const c=document.createElement("div");c.className="comment";
+  c.innerHTML=`<div class="row"><select><option ${sev=="blocker"?"selected":""}>blocker</option><option ${sev=="major"?"selected":""}>major</option><option ${sev=="nit"?"selected":""}>nit</option></select>
+  <select><option ${cat=="correctness"?"selected":""}>correctness</option><option ${cat=="security"?"selected":""}>security</option><option ${cat=="scale"?"selected":""}>scale</option><option ${cat=="reliability"?"selected":""}>reliability</option><option ${cat=="style"?"selected":""}>style</option></select></div>
+  <textarea>${text}</textarea>`;
+  ln.after(c);
+}
+addComment(14,"blocker","scale","time.sleep in an async generator blocks the event loop for every request.");
+addComment(17,"major","reliability","No media_type, and prompt has no length limit.");
+rv.addEventListener("click",e=>{const ln=e.target.closest(".ln");if(ln&&!ln.classList.contains("flag"))addComment(+ln.dataset.l,"major","correctness","")});
+// chrome
+const chromeHtml=document.getElementById("chrome").innerHTML, side=document.getElementById("side").innerHTML;
+const order=["concept","predict","review","fix","prove","defend"];
+document.querySelectorAll("[data-step]").forEach(s=>{
+  s.insertAdjacentHTML("afterbegin",chromeHtml);
+  s.querySelector("[data-side]").outerHTML=side;
+  const cur=order.indexOf(s.dataset.step);
+  s.querySelectorAll(".step").forEach(st=>{const i=order.indexOf(st.dataset.k);if(i<cur)st.classList.add("done");if(i===cur)st.classList.add("cur")});
+});
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));
+  document.querySelectorAll(".mock-nav button").forEach(b=>b.classList.toggle("on",b.dataset.s===id));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(b.dataset.go));
+</script>
+</body>
+</html>
