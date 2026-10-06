@@ -1,0 +1,30 @@
+# Runs the app's tests and verifies every lesson. The ruleset on `main` requires this check ("tests").
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.11"
+      - name: Install app and course dependencies
+        run: |
+          uv sync
+          uv sync --project courses/backend-for-ai-engineers
+      - name: App tests
+        run: make test-app
+      - name: Check every lesson (solutions pass, starters fail, Prove works)
+        run: make check-content
