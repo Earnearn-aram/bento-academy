@@ -1,0 +1,5 @@
+id = "websocket"
+title = "WebSocket"
+short = "WebSocket"
+icon = "sushi"
+summary = "Handshake, send/receive loop, connection manager, broadcast, heartbeat, disconnects."

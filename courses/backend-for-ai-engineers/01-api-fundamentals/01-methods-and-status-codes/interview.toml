@@ -1,0 +1,33 @@
+[[questions]]
+prompt = "A teammate says the second `DELETE /prompts/7` must return `204`, not `404`, \"otherwise DELETE isn't idempotent\". Are they right? What would you ship, and why?"
+answer = """
+**On the definition, no.** Idempotency is about the *intended effect on server state*, not the response. MDN's own example of an idempotent DELETE returns 200, then 404. After one call or ten, prompt 7 is gone.
+
+**On what to ship, it's a real trade-off:**
+
+- **404 on repeat** is honest and helps catch client bugs (deleting the wrong id shows up). Clients that retry must treat 404 on DELETE as "already done".
+- **204 every time** makes retries quiet: a mobile client that retried after a timeout just sees success. The cost: a typo'd id also "succeeds", hiding bugs.
+
+I'd pick based on who calls the API. If clients retry automatically (mobile apps, job queues), I'd choose 204 always. For internal services, I'd choose 404 plus a shared client helper that treats it as success. Either way, it goes in the API docs and every endpoint does the same thing. Consistency matters more than which one you pick. *(The choice is my opinion; the definition is from MDN.)*
+"""
+
+[[questions]]
+prompt = "Creating a prompt can fail because the name is taken, or because the template is empty. Which status codes would you return, and why does the difference matter to the client?"
+answer = """
+- **Empty template → `422 Unprocessable Content`.** The content itself is invalid. MDN notes that repeating the same request unchanged will fail again, so the client must change its input. FastAPI returns this automatically when a Pydantic model rejects the body.
+- **Name taken → `409 Conflict`.** The request is fine; it clashes with the current state. The same request could succeed later, once the other prompt is renamed or deleted.
+
+**Why it matters:** the client can branch on the code without parsing message strings. On 422 it shows field errors; on 409 it says "choose another name" or offers to open the existing prompt. Dashboards can also tell "clients send junk" apart from "users race for names". Using `400` for both throws that information away.
+"""
+
+[[questions]]
+prompt = "Why is `GET /prompts/{id}/delete` dangerous even when the endpoint requires a logged-in user?"
+answer = """
+Because the rest of the web is built on **GET being safe** (MDN: safe methods are read-only from the client's point of view):
+
+- **Automated callers send GET without asking:** browsers prefetch links, crawlers follow them (both named by MDN), and chat apps fetch URLs to build link previews *(my addition)*.
+- **With cookie-based auth, a page on another site can trigger it:** something as small as `<img src="https://our-api/prompts/7/delete">` makes the browser send the request with the user's cookies. That is cross-site request forgery. *(General security practice, not from this lesson's sources.)*
+- **Retries and caches assume GET can be repeated** with no side effects.
+
+Auth only checks *who* is calling. It doesn't help when the user's own browser is the one being tricked. The fix: use the `DELETE` method, and add CSRF protection if you use cookie auth.
+"""

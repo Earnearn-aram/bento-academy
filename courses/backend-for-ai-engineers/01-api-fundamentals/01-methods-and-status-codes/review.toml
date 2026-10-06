@@ -1,0 +1,81 @@
+title = "Add prompt library API"
+author = "junior"
+description = """
+**PR #7 by a junior dev:** "Adds CRUD for prompt templates so the summarizer and the chatbot can share prompts. Tested by hand in Swagger, everything returns 200 👍"
+"""
+file = "buggy/main.py"
+goal = "Find the blockers and majors. Click a line to comment. Comments on correct code count as false alarms."
+model_review = """
+**Request changes.** The happy path works, but several routes tell clients the wrong thing.
+
+- **Blocker, line 45:** delete is a `GET`. GET is defined as safe, and browsers, crawlers and link previews call it freely, so one unfurled link in Slack deletes a prompt. Use `@app.delete("/prompts/{prompt_id}")`.
+- **Blocker, line 36:** an unknown id returns `200` with `null`. Clients and caches treat that as success. Raise `HTTPException(404)`.
+- **Major, line 47:** `del prompts[prompt_id]` raises `KeyError` for an unknown id, so the client gets a `500`. That's our bug showing, not theirs. Return `404`.
+- **Major, line 25:** create returns the default `200`. Use `status_code=201` and set a `Location` header so clients can fetch the new prompt.
+- **Major, lines 28–29:** nothing stops two prompts having the same name. The summarizer looks prompts up by name, so return `409 Conflict`.
+- **Major, line 41:** `PUT` to an unknown id silently creates it. Ids come from `next_id`, so a later `POST` can be given the same id and overwrite it. Return `404`.
+- **Nit, line 3:** `json` is unused.
+
+"Everything returns 200" is the problem: a status code is part of the contract, not decoration.
+"""
+teaching_comment = """
+> Line 36: what should a client see when it asks for prompt 999 and it doesn't exist? Right now it gets `200` and `null`, which says "success, and the prompt is empty". Could you raise `HTTPException(status_code=404)` here? The FastAPI "Handling Errors" page has the exact pattern. A tiny helper like `get_or_404()` would also fix the same problem in PUT and DELETE.
+
+A question first, then the reason, then a pointer. It teaches the rule instead of only fixing this one line.
+"""
+
+[[issues]]
+id = "get-deletes"
+lines = [45, 46]
+severity = "blocker"
+category = "security"
+title = "Delete is done with GET"
+explanation = "GET must be safe: browsers prefetch, crawlers follow links and chat apps unfurl URLs, all with GET. Use the DELETE method."
+
+[[issues]]
+id = "missing-200-null"
+lines = [34, 36]
+severity = "blocker"
+category = "correctness"
+title = "Unknown id returns 200 with null"
+explanation = "`prompts.get()` returns `None`, which FastAPI sends as `null` with the default 200. Raise `HTTPException(404)`."
+
+[[issues]]
+id = "delete-keyerror"
+lines = [47, 47]
+severity = "major"
+category = "reliability"
+title = "Deleting an unknown id crashes with 500"
+explanation = "`del` on a missing key raises `KeyError`, which becomes a 500. Check first and return 404."
+
+[[issues]]
+id = "create-200"
+lines = [25, 26]
+severity = "major"
+category = "correctness"
+title = "Create returns 200 with no Location"
+explanation = "A create should return `201 Created` with a `Location` header pointing at the new resource."
+
+[[issues]]
+id = "duplicate-name"
+lines = [28, 29]
+severity = "major"
+category = "correctness"
+title = "Duplicate names are accepted"
+explanation = "Nothing checks for an existing prompt with the same name. Return `409 Conflict`."
+
+[[issues]]
+id = "put-creates"
+lines = [40, 42]
+severity = "major"
+category = "reliability"
+title = "PUT on an unknown id creates it"
+explanation = "Ids come from `next_id`, so a PUT-created id can later be handed out again by POST and overwritten. Return 404."
+
+[[issues]]
+id = "unused-import"
+lines = [3, 3]
+severity = "nit"
+category = "style"
+title = "Unused import"
+explanation = "`json` is never used."

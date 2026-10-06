@@ -1,0 +1,5 @@
+id = "capstone"
+title = "Capstone: contract-review service"
+short = "Capstone"
+icon = "bento"
+summary = "Upload via API, stream the review over SSE, live status over WebSocket, signed webhook."

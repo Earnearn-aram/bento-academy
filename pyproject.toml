@@ -1,0 +1,26 @@
+[project]
+name = "bento-academy"
+version = "0.1.0"
+description = "Local, Codecademy-style interactive learning app."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.142.2",
+    "uvicorn==0.54.0",
+    "pydantic==2.13.5",
+    "markdown-it-py==4.2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "httpx2==2.13.1",  # Starlette 1.7 TestClient is built on httpx2
+]
+# Browser smoke test only; not installed by `make start`.
+e2e = ["playwright"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests_app"]

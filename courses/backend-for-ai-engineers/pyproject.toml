@@ -1,0 +1,30 @@
+# Dependencies for the "Backend for AI engineers" course only.
+# Each course is its own uv project, so a future course can use a different stack.
+[project]
+name = "bento-course-backend-for-ai-engineers"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.142.2",
+    "starlette==1.7.0",
+    "pydantic==2.13.5",
+    "httpx==0.28.1",       # HTTP client taught in the lessons
+    "httpx2==2.13.1",      # Starlette 1.7 TestClient is built on httpx2 (plain httpx is deprecated there)
+    "websockets==17.2",
+    "uvicorn==0.54.0",
+    "pyjwt==2.15.1",
+    "pytest==9.1.1",
+    "pytest-timeout==2.4.0",
+]
+
+[dependency-groups]
+# Optional: `uv sync --group anthropic` to stream from the real Claude API.
+anthropic = ["anthropic"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+# Makes this folder pytest's rootdir, so conftest.py here is always loaded.
+addopts = "-p no:cacheprovider"
+timeout = 30

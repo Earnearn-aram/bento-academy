@@ -1,0 +1,22 @@
+id = "backend-for-ai-engineers"
+title = "Backend for AI engineers"
+description = "APIs, streaming, SSE, WebSocket, webhooks, and a capstone."
+version = 1
+
+[env]
+# Run once by `make start`: installs this course's own dependencies.
+setup = ["uv", "sync", "--quiet", "--project", "{course_dir}"]
+
+[tests]
+# How bento-academy runs a lesson's tests. A non-Python course would point at its
+# own command plus an adapter that writes the same results JSON to {report}.
+command = [
+  "uv", "run", "--no-sync", "--quiet", "--project", "{course_dir}",
+  "pytest", "-c", "{course_dir}/pyproject.toml", "--rootdir", "{course_dir}",
+  "--import-mode=importlib", "-q", "-p", "bento_report", "-p", "course_fixtures",
+  "--target", "{code_dir}", "--bento-report", "{report}", "{tests}",
+]
+timeout_s = 90
+
+[steps]
+default = ["concept", "predict", "review", "fix", "prove", "defend"]

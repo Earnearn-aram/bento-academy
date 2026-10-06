@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bento-academy UI mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e4d9c9;          /* beige page, like the animal sheet */
+  --panel:#fbf6ec;       /* cream card */
+  --panel-2:#f1e8d8;     /* inset areas */
+  --ink:#4a3b2c;         /* dark brown pixel lines and text */
+  --muted:#6f604c;
+  --accent:#e0784f;      /* cat orange */
+  --accent-ink:#ffffff;
+  --accent-soft:#f7dccd;
+  --mint:#dbe7d2;        /* header bar, like the pet card */
+  --ok:#5b7a4f;--ok-soft:#dbe7d2;
+  --bad:#c84a3a;--bad-soft:#f6d9d2;
+  --warn:#b8862f;--warn-soft:#f5e6c4;
+  --shadow:#cbbda8;
+  --code-bg:#2e2a24;--code-ink:#f1e7d3;--code-muted:#8a7d6a;--code-hl:#4a3a2c;
+  --code-kw:#f0a070;--code-cm:#9fbf8a;
+  --px:3px;
+  --hi:rgba(255,255,255,.6);--lo:rgba(74,59,44,.16);  /* 16-bit bevel */
+  /* Pixel font only for big headings; everything you read is a clean sans. */
+  --pixel:"Pixelify Sans",ui-monospace,monospace;
+  --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --label:var(--body);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --hi:rgba(255,255,255,.07);--lo:rgba(0,0,0,.35);
+  --bg:#231e19;--panel:#2f2822;--panel-2:#3a3129;--ink:#efe3cf;--muted:#a8977f;
+  --accent:#f08a5d;--accent-soft:#4a3125;--mint:#34402f;--ok:#9cc48a;--ok-soft:#2f3d2a;
+  --bad:#f08272;--bad-soft:#4a2620;--warn:#e8bd5f;--warn-soft:#45381c;--shadow:#16120e;
+  --code-bg:#1b1814;
+}}
+:root[data-theme="dark"]{
+  --hi:rgba(255,255,255,.07);--lo:rgba(0,0,0,.35);
+  --bg:#231e19;--panel:#2f2822;--panel-2:#3a3129;--ink:#efe3cf;--muted:#a8977f;
+  --accent:#f08a5d;--accent-soft:#4a3125;--mint:#34402f;--ok:#9cc48a;--ok-soft:#2f3d2a;
+  --bad:#f08272;--bad-soft:#4a2620;--warn:#e8bd5f;--warn-soft:#45381c;--shadow:#16120e;
+  --code-bg:#1b1814;
+}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.6 var(--body);background:var(--bg);color:var(--ink)}
+code{font-family:var(--mono);font-size:.85em;background:var(--panel-2);padding:0 4px}
+svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block}
+
+/* ---------- pixel primitives ---------- */
+/* Notched-corner pixel border: four hard shadows, no blur. */
+.px{
+  box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),
+    0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),
+    var(--px) 0 0 0 var(--ink);
+  margin:var(--px);
+}
+.px-drop{
+  box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),
+    0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),
+    var(--px) 0 0 0 var(--ink),
+    0 calc(3*var(--px)) 0 0 var(--shadow);
+}
+.btn{
+  font:600 15px var(--label);cursor:pointer;border:0;padding:7px 14px;margin:var(--px);
+  background:var(--panel);color:var(--ink);
+}
+.btn:hover{background:var(--panel-2)}
+.btn:active{transform:translateY(var(--px));box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn small{font-size:11px;opacity:.85}
+
+/* 16-bit bevel: light top-left edge, dark bottom-right edge, inside the pixel border. */
+.bevel,.btn.px,.btn.px-drop,.mod.px,.step.px,.score .px,.opt.px{
+  box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink),
+    inset 3px 3px 0 0 var(--hi),inset -3px -3px 0 0 var(--lo);
+}
+.btn.px-drop{
+  box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink),
+    0 calc(3*var(--px)) 0 0 var(--shadow),
+    inset 3px 3px 0 0 var(--hi),inset -3px -3px 0 0 var(--lo);
+}
+.btn:active{box-shadow:
+    0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),
+    calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink),
+    inset 3px 3px 0 0 var(--lo),inset -3px -3px 0 0 var(--hi)}
+.blocks i{box-shadow:inset 2px 2px 0 0 var(--hi),inset -2px -2px 0 0 var(--lo)}
+.side h4 svg.sprite{flex:none}
+.label{font-family:var(--label);font-size:14px;font-weight:700}
+
+/* ---------- mockup switcher ---------- */
+.mock-nav{display:flex;gap:6px;padding:8px 16px;background:var(--ink);color:var(--bg);align-items:center;flex-wrap:wrap}
+.mock-nav span{font:700 14px var(--label)}
+.mock-nav .btn{font-size:14px;padding:4px 10px}
+.mock-nav .btn.on{background:var(--accent);color:#fff}
+.screen{display:none}.screen.on{display:block}
+
+/* ---------- home ---------- */
+.home{max-width:880px;margin:0 auto;padding:36px 16px 48px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand h1{margin:0;font:600 32px var(--pixel)}
+.home .sub{color:var(--muted);margin:6px 0 28px}
+.course{background:var(--panel)}
+.course .head{background:var(--mint);padding:8px 16px;border-bottom:var(--px) solid var(--ink);text-align:center}
+.course .body{padding:20px;display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+.course h2{margin:0 0 4px;font:600 24px var(--pixel)}
+.course p{margin:0 0 14px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:1fr auto;gap:2px 24px;font-family:var(--label);font-size:15px;margin-bottom:14px}
+.stats span:nth-child(even){text-align:right}
+.blocks{display:flex;gap:3px;flex-wrap:wrap}
+.blocks i{width:12px;height:14px;background:var(--panel-2);outline:2px solid var(--ink);outline-offset:-2px}
+.blocks i.f{background:var(--accent)}
+.modules{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;padding:0 20px 20px}
+.mod{background:var(--panel-2);padding:12px 6px 8px;text-align:center;cursor:pointer}
+.mod .art{height:48px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:6px}
+.mod .name{font:700 13px var(--label);line-height:1.25}
+.mod .st{font-size:13px;color:var(--muted)}
+.mod.locked{cursor:default}
+.mod.locked .art{filter:saturate(.35) opacity(.55)}
+.mod.cur{background:var(--accent-soft)}
+.continue{margin-top:22px;background:var(--panel);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* ---------- lesson chrome ---------- */
+.top{display:flex;align-items:center;gap:12px;padding:8px 16px;background:var(--mint);border-bottom:var(--px) solid var(--ink);flex-wrap:wrap}
+.crumbs{font-size:15px;color:var(--muted)}.crumbs b{color:var(--ink);font-weight:600}
+.top .spacer{flex:1}
+.steps{display:flex;gap:2px;flex-wrap:wrap}
+.step{font:600 13px var(--label);padding:4px 9px;margin:var(--px);background:var(--panel);color:var(--muted)}
+.step.done{background:var(--ok-soft);color:var(--ok)}
+.step.done::before{content:"✓ "}
+.step.cur{background:var(--accent);color:#fff}
+.layout{display:grid;grid-template-columns:250px minmax(0,1fr) minmax(0,1.15fr);height:calc(100vh - 96px)}
+.side{border-right:var(--px) solid var(--ink);overflow:auto;padding:10px 10px 20px;background:var(--panel)}
+.side h4{margin:14px 4px 6px;display:flex;align-items:center;gap:8px;font:700 13px var(--label);color:var(--muted)}
+.side a{display:flex;gap:8px;align-items:center;padding:4px 8px;color:var(--ink);text-decoration:none;font-size:15px;cursor:pointer}
+.side a:hover{background:var(--panel-2)}
+.side a.cur{background:var(--accent-soft);font-weight:600}
+.box{width:14px;height:14px;flex:none;outline:2px solid var(--ink);outline-offset:-2px;display:grid;place-items:center;font:700 11px var(--label);color:#fff}
+.box.done{background:var(--ok);outline-color:var(--ok)}
+.side .quiz{color:var(--muted)}
+.left{overflow:auto;padding:20px 24px;border-right:var(--px) solid var(--ink);background:var(--panel)}
+.left h2{margin:0 0 10px;font:600 24px var(--pixel)}
+.left h3{margin:22px 0 6px;font:800 16px var(--label)}
+.left p{margin:0 0 10px}
+.ex{background:var(--code-bg);color:var(--code-ink);padding:12px;font:13px/1.55 var(--mono);overflow:auto;margin:6px var(--px) 10px}
+.task{background:var(--accent-soft);padding:10px 14px;margin:8px var(--px)}
+.task .label{display:block;color:var(--accent);margin-bottom:2px}
+.fold{background:var(--panel);margin:12px var(--px)}
+.fold summary{padding:8px 12px;cursor:pointer;font:700 15px var(--label);list-style:none;display:flex;align-items:center;gap:8px}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary::before{content:"▶";font-size:10px}
+.fold[open] summary::before{content:"▼"}
+.fold .body{padding:0 14px 12px;font-size:15px}
+.lock{font:600 13px var(--label);color:var(--muted);margin-left:auto}
+.right{display:flex;flex-direction:column;min-height:0;background:var(--panel)}
+.tool{display:flex;gap:6px;padding:8px 10px;border-bottom:var(--px) solid var(--ink);background:var(--panel);align-items:center;flex-wrap:wrap}
+.tool .file{font:12px var(--mono);color:var(--muted);margin-right:auto}
+.sync{font:600 13px var(--label);color:var(--ok)}
+.editor{flex:1;background:var(--code-bg);color:var(--code-ink);font:13px/1.65 var(--mono);overflow:auto;padding:10px 0;min-height:0}
+.ln{display:flex;white-space:pre}
+.ln .n{width:46px;text-align:right;padding-right:12px;color:var(--code-muted);user-select:none;flex:none}
+.ln .cm{color:var(--code-cm)}.ln .kw{color:var(--code-kw)}
+.review .ln{cursor:pointer}.review .ln:hover{background:var(--code-hl)}
+.review .ln.flag .n{color:var(--accent)}
+.review .ln.flag .n::before{content:"■ "}
+.results{border-top:var(--px) solid var(--ink);background:var(--panel);max-height:42%;overflow:auto;padding:10px 14px}
+.results h4{margin:0 0 6px;display:flex;justify-content:space-between;align-items:center;font:800 15px var(--label)}
+.chk{display:flex;gap:10px;padding:6px 0;border-bottom:2px dashed var(--panel-2);font-size:15px}
+.chk:last-child{border:0}
+.chk .ic{flex:none;width:18px;height:18px;display:grid;place-items:center;font:800 12px var(--label);color:#fff;margin-top:3px}
+.chk.pass .ic{background:var(--ok)}.chk.fail .ic{background:var(--bad)}
+.chk small{display:block;color:var(--muted);font-size:15px}
+.chk.fail small.why{color:var(--bad)}
+.tag{font:700 12px var(--label);padding:1px 7px;margin-left:6px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.comment{margin:4px 14px 10px 58px;background:var(--panel);color:var(--ink);padding:8px 10px;font:15px/1.5 var(--body);white-space:normal}
+.comment .row{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.comment select,.comment textarea{font:15px var(--body);background:var(--panel-2);color:var(--ink);border:2px solid var(--ink);border-radius:0;padding:3px 4px}
+.comment textarea{width:100%;min-height:44px}
+.score{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 12px}
+.score div{background:var(--panel-2);padding:8px;text-align:center;font:600 13px var(--label);color:var(--muted)}
+.score b{display:block;font:600 26px var(--pixel);color:var(--ink)}
+.pr{font-size:15px;color:var(--muted);padding:8px 12px;border-bottom:var(--px) solid var(--ink);background:var(--panel)}
+.pr b{color:var(--ink)}
+.badge{display:inline-block;font:700 12px var(--label);padding:2px 7px;background:var(--warn-soft);color:var(--warn);margin-left:6px}
+.opt{display:block;background:var(--panel);padding:8px 12px;margin:10px var(--px);cursor:pointer}
+.opt:hover{background:var(--panel-2)}
+.opt.right-ans{background:var(--ok-soft)}
+.note{font-size:15px;color:var(--muted)}
+.bubble{display:flex;gap:12px;align-items:flex-end;margin:16px 0}
+.bubble .say{background:var(--panel);padding:8px 12px;font-size:15px}
+.answer{width:calc(100% - 2*var(--px));min-height:90px;background:var(--panel-2);color:var(--ink);border:0;padding:8px;font:16px/1.5 var(--body)}
+.win{background:var(--ok-soft);padding:12px 14px;margin:18px var(--px);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;height:auto}
+  .side{display:none}
+  .left{border-right:0;border-bottom:var(--px) solid var(--ink)}
+  .editor{min-height:360px}
+  .course .body{grid-template-columns:1fr;justify-items:start}
+  .modules{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="mock-nav">
+  <span>Mockup ▸</span>
+  <button class="btn px on" data-s="home">1 Home</button>
+  <button class="btn px" data-s="predict">2 Predict</button>
+  <button class="btn px" data-s="review">3 Review PR</button>
+  <button class="btn px" data-s="fix">4 Fix + Run tests</button>
+  <button class="btn px" data-s="defend">5 Defend</button>
+  <button class="btn px" id="theme" style="margin-left:auto">theme</button>
+</div>
+
+<!-- HOME -->
+<section class="screen on" id="home">
+  <div class="home">
+    <div class="brand"><span data-sprite="bento" data-size="3"></span><h1>bento-academy</h1></div>
+    <p class="sub">Learn one small box at a time.</p>
+
+    <div class="course px">
+      <div class="head label">Course 1</div>
+      <div class="body">
+        <span data-sprite="mascot" data-size="7"></span>
+        <div>
+          <h2>Backend for AI engineers</h2>
+          <p>APIs, streaming, SSE, WebSocket, webhooks, and a capstone.</p>
+          <div class="stats">
+            <span>Lessons</span><span>8 / 34</span>
+            <span>Quizzes</span><span>1 / 6</span>
+            <span>Review accuracy</span><span>72%</span>
+            <span>Now</span><span>Streaming</span>
+          </div>
+          <div class="blocks" id="blocks"></div>
+        </div>
+      </div>
+      <div class="modules">
+        <div class="mod px" data-go="fix"><div class="art"><span data-sprite="onigiri" data-size="3"></span></div><div class="name">API basics</div><div class="st">7/7 ✓</div></div>
+        <div class="mod px cur" data-go="fix"><div class="art"><span data-sprite="ramen" data-size="3"></span></div><div class="name">Streaming</div><div class="st">1/5</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="dango" data-size="3"></span></div><div class="name">SSE</div><div class="st">0/5</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="sushi" data-size="3"></span></div><div class="name">WebSocket</div><div class="st">0/6</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="taiyaki" data-size="3"></span></div><div class="name">Webhooks</div><div class="st">0/6</div></div>
+        <div class="mod px locked"><div class="art"><span data-sprite="bento" data-size="3"></span></div><div class="name">Capstone</div><div class="st">0/5</div></div>
+      </div>
+    </div>
+
+    <div class="continue px">
+      <span>Continue: <b>2.2 StreamingResponse</b> · step Fix</span>
+      <button class="btn primary px-drop" data-go="fix">Continue ▸</button>
+    </div>
+  </div>
+</section>
+
+<template id="chrome">
+  <div class="top">
+    <span class="crumbs">Backend for AI engineers › Streaming › <b>2.2 StreamingResponse</b></span>
+    <span class="spacer"></span>
+    <div class="steps">
+      <span class="step px" data-k="concept">Concept</span>
+      <span class="step px" data-k="predict">Predict</span>
+      <span class="step px" data-k="review">Review</span>
+      <span class="step px" data-k="fix">Fix</span>
+      <span class="step px" data-k="prove">Prove</span>
+      <span class="step px" data-k="defend">Defend</span>
+    </div>
+  </div>
+</template>
+<template id="side">
+  <nav class="side">
+    <h4><span data-sprite="onigiri" data-size="1"></span>1 · API basics</h4>
+    <a><span class="box done">✓</span>1.1 Methods & status codes</a>
+    <a><span class="box done">✓</span>1.2 Pydantic models</a>
+    <a><span class="box done">✓</span>1.3 Async vs sync</a>
+    <a><span class="box done">✓</span>1.4 Timeouts & retries</a>
+    <a><span class="box done">✓</span>1.5 Error handling</a>
+    <a><span class="box done">✓</span>1.6 Pagination</a>
+    <a><span class="box done">✓</span>1.7 Auth: API key & JWT</a>
+    <a class="quiz"><span class="box done">✓</span>Quiz · Design question</a>
+    <h4><span data-sprite="ramen" data-size="1"></span>2 · Streaming</h4>
+    <a><span class="box done">✓</span>2.1 Generators</a>
+    <a class="cur"><span class="box"></span>2.2 StreamingResponse</a>
+    <a><span class="box"></span>2.3 Chunked transfer</a>
+    <a><span class="box"></span>2.4 Backpressure</a>
+    <a><span class="box"></span>2.5 Client disconnects</a>
+    <a class="quiz"><span class="box"></span>Quiz · Design question</a>
+    <h4><span data-sprite="dango" data-size="1"></span>3 · SSE</h4><a><span class="box"></span>3.1 Event format</a><a><span class="box"></span>…</a>
+    <h4><span data-sprite="sushi" data-size="1"></span>4 · WebSocket</h4><a><span class="box"></span>…</a>
+    <h4><span data-sprite="taiyaki" data-size="1"></span>5 · Webhooks</h4><a><span class="box"></span>…</a>
+    <h4><span data-sprite="bento" data-size="1"></span>6 · Capstone</h4><a><span class="box"></span>…</a>
+  </nav>
+</template>
+
+<!-- PREDICT -->
+<section class="screen" id="predict" data-step="predict">
+  <div class="layout">
+    <div data-side></div>
+    <div class="left">
+      <h2>Predict</h2>
+      <p class="note">Read the code on the right. Answer before you run it.</p>
+      <h3>Q1 · When does the client see the first token?</h3>
+      <label class="opt px">A. After ~1.0 s, when the whole response is ready</label>
+      <label class="opt px right-ans">B. After ~0.1 s, at the first <code>yield</code> ✓</label>
+      <label class="opt px">C. Immediately, before the generator starts</label>
+      <div class="bubble"><span data-sprite="mascot" data-size="3"></span><div class="say px">Correct! <code>StreamingResponse</code> sends each chunk as it is yielded. Press <b>Run it</b> to see the timings.</div></div>
+      <h3>Q2 · Is there a <code>Content-Length</code> header?</h3>
+      <label class="opt px">A. Yes, FastAPI computes it</label>
+      <label class="opt px">B. No, the length is unknown up front</label>
+    </div>
+    <div class="right">
+      <div class="tool"><span class="file">predict/snippet.py · read-only</span><button class="btn primary px">▶ Run it</button></div>
+      <div class="editor" data-code="predict"></div>
+      <div class="results"><h4>Output</h4><pre style="margin:0;font:13px/1.5 var(--mono)">t=0.10s  b'tok0 '
+t=0.20s  b'tok1 '
+…
+t=1.00s  b'tok9 '</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEW -->
+<section class="screen" id="review" data-step="review">
+  <div class="layout">
+    <div data-side></div>
+    <div class="left">
+      <h2>Review the PR</h2>
+      <p>An AI agent opened this PR: <i>“Add /chat/stream endpoint that streams LLM tokens.”</i> Its own tests pass. Would you merge it?</p>
+      <p class="note">Click a line to comment. Pick severity and category, then say why in one line.</p>
+      <div class="task px"><span class="label">Goal</span>Find the blockers. Comments on correct code count as false alarms.</div>
+      <h3>Your score</h3>
+      <div class="score">
+        <div class="px"><b>2/3</b>blockers</div>
+        <div class="px"><b>1/2</b>majors</div>
+        <div class="px"><b>1</b>false alarm</div>
+      </div>
+      <details class="fold px"><summary>Missed · line 13 · blocker</summary><div class="body">The loop never stops when the client disconnects. Every closed tab keeps spending LLM tokens. Fix: check for disconnect and close the upstream stream in <code>finally</code>.</div></details>
+      <details class="fold px"><summary>Model review (how a Lead writes it)</summary><div class="body">Blocking: <code>time.sleep</code> inside an async generator stalls the event loop for every user…</div></details>
+      <div style="margin-top:12px"><button class="btn primary px-drop">Submit review</button> <button class="btn px">Next: fix it ▸</button></div>
+    </div>
+    <div class="right review">
+      <div class="pr"><b>PR #12</b> by <b>ai-agent</b><span class="badge">AI-generated</span> · app/chat.py · +24 −0</div>
+      <div class="editor" data-code="review"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FIX -->
+<section class="screen" id="fix" data-step="fix">
+  <div class="layout">
+    <div data-side></div>
+    <div class="left">
+      <h2>2.2 StreamingResponse</h2>
+      <p>A normal response is built in full, then sent. A <b>streaming</b> response is sent piece by piece while your code is still producing it. In FastAPI you return a <code>StreamingResponse</code> that wraps a generator; each <code>yield</code> becomes one chunk on the wire…</p>
+      <h3>Worked example</h3>
+      <pre class="ex px">async def tokens():
+    for t in ["Hel", "lo"]:
+        yield t.encode()
+
+@app.get("/demo")
+async def demo():
+    return StreamingResponse(tokens(), media_type="text/plain")</pre>
+      <h3>Your task</h3>
+      <div class="task px"><span class="label">Task</span>Fix the PR you reviewed: stream tokens from <code>fake_llm()</code> without blocking the event loop, and stop when the client disconnects.</div>
+      <details class="fold px"><summary>Hints <span class="lock">1 of 3</span></summary><div class="body">1. Which call in the generator blocks the whole event loop? There is an async version of it.</div></details>
+      <details class="fold px"><summary>Best practice <span class="lock">unlocks on pass · open early</span></summary><div class="body">In production · Common mistakes · Trade-offs · What breaks at scale · Security & reliability · Observability</div></details>
+      <details class="fold px"><summary>Stretch: cap stream at 60 s <span class="lock">optional</span></summary><div class="body">…</div></details>
+      <details class="fold px"><summary>Read more</summary><div class="body">FastAPI: Stream Data · Starlette: Responses · HTTPX: Streaming responses</div></details>
+    </div>
+    <div class="right">
+      <div class="tool">
+        <span class="file">exercises/…/02-streaming-response/main.py</span>
+        <span class="sync">■ synced</span>
+      </div>
+      <div class="tool">
+        <button class="btn primary px-drop">▶ Run tests <small>Ctrl+Enter</small></button>
+        <button class="btn px">Hint</button><button class="btn px">Solution</button><button class="btn px">Reset</button>
+      </div>
+      <div class="editor" data-code="fix"></div>
+      <div class="results">
+        <h4><span>Tests · 3 of 4 passed</span><span class="note">0.9 s</span></h4>
+        <div class="chk pass"><span class="ic">✓</span><div>Endpoint returns 200 with text/plain</div></div>
+        <div class="chk pass"><span class="ic">✓</span><div>Tokens arrive in more than one chunk</div></div>
+        <div class="chk pass"><span class="ic">✓</span><div>First chunk arrives before the stream ends<span class="tag">best practice</span></div></div>
+        <div class="chk fail"><span class="ic">✗</span><div>Generator stops after the client disconnects<span class="tag">best practice</span>
+          <small class="why">Expected the fake LLM to stop within 0.5 s of disconnect; it produced all 50 tokens.</small>
+          <small>Hint: wrap the loop in try/finally. · <u>Show details</u></small></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEFEND -->
+<section class="screen" id="defend" data-step="defend">
+  <div class="layout">
+    <div data-side></div>
+    <div class="left">
+      <h2>Defend it</h2>
+      <p class="note">Answer out loud or in the box, then reveal the model answer.</p>
+      <h3>Interview 1</h3>
+      <p>Streaming works locally, but users behind the company proxy get the whole answer at once after 20 s. How do you debug it, and what do you change?</p>
+      <textarea class="answer px" placeholder="Your answer…"></textarea>
+      <details class="fold px"><summary>Reveal model answer</summary><div class="body">Suspect buffering by an intermediary…</div></details>
+      <h3>Interview 2</h3>
+      <p>Why might you choose NDJSON over SSE for an internal service-to-service token stream?</p>
+      <details class="fold px"><summary>Reveal model answer</summary><div class="body">…</div></details>
+      <div class="win px">
+        <span data-sprite="mascot" data-size="3"></span>
+        <div style="flex:1"><span class="label">Lesson complete!</span><br>✓ Predict · ✓ Review 2/3 · ✓ Tests · ✓ Prove</div>
+        <button class="btn primary px-drop">Next lesson ▸</button>
+      </div>
+    </div>
+    <div class="right">
+      <div class="tool"><span class="label">Best practice</span></div>
+      <div class="left" style="border:0">
+        <h3>In production</h3><p>Behind nginx or a CDN, turn off response buffering for streaming routes…</p>
+        <h3>Common mistakes</h3>
+        <pre class="ex px"># ✗ blocks every user
+time.sleep(0.1)
+# ✓
+await asyncio.sleep(0.1)</pre>
+        <h3>Trade-offs</h3><p>Plain streaming vs SSE vs WebSocket…</p>
+        <h3>What breaks at scale</h3><p>One open connection per user per worker…</p>
+        <h3>Observability</h3><p>Log time-to-first-token, tokens/s, and disconnect reason…</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ---------- pixel sprites: one char = one pixel ---------- */
+const PAL={
+  K:"#3b2a20",                         // outline
+  W:"#ffffff",w:"#e6dccb",             // rice / white + shade
+  D:"#2f3b2f",d:"#4f6352",             // nori + highlight
+  R:"#c8453a",r:"#9b2f27",h:"#e8735f", // lacquer red: base, shadow, highlight
+  T:"#e9b866",L:"#f7e2a8",             // broth, noodles
+  Y:"#f5c542",y:"#d9a21f",             // yolk / tamago + shade
+  P:"#f4a6b8",p:"#d97a93",             // pink + shade
+  M:"#8fb56f",m:"#5f8a45",             // green + shade
+  O:"#f28c5c",o:"#d0663a",S:"#ffd8c4", // salmon base, shade, fat stripe
+  N:"#d9984f",n:"#a8692c",             // baked batter + shade
+  B:"#8a5530",                         // wood
+  C:"#fff7e6",c:"#ead7b6"              // bun dough + shade
+};
+/* 16-bit style: 16px grid, outline, 2-3 shades per colour. "." = transparent. */
+const SPRITES={
+  onigiri:[
+    "................",
+    ".......KK.......",
+    "......KWWK......",
+    ".....KWWWWK.....",
+    "....KWWWWWWK....",
+    "....KWWWWWwK....",
+    "...KWWWWWWwwK...",
+    "...KWWWWWWWwK...",
+    "..KWWWWWWWWwwK..",
+    "..KWWWDDDDWWwK..",
+    ".KWWWWDdDDWWwwK.",
+    ".KWWWWDdDDWWWwK.",
+    "KWWWWWDdDDWWWwwK",
+    "KwWWWWDDDDWWWwwK",
+    ".KwwwwDDDDwwwwK.",
+    "..KKKKKKKKKKKK.."],
+  ramen:[
+    "..........B..B..",
+    ".........B..B...",
+    "........B..B....",
+    "..KKKKKKKKKKKK..",
+    ".KLLTMTPPTWWTLK.",
+    "KTLLTMPpPTWYYWTK",
+    "KhRRRRRRRRRRRRrK",
+    "KhRRWRRRWRRRWRrK",
+    ".KhRRRRRRRRRRrK.",
+    ".KhRRRRRRRRRRrK.",
+    "..KRRRRRRRRRrK..",
+    "...KKrrrrrrKK...",
+    "....KBBBBBBK....",
+    "....KKKKKKKK....",
+    "................",
+    "................"],
+  dango:[
+    "....BB....",
+    "..KKKKKK..",
+    ".KPWPPPpK.",
+    ".KPPPPPpK.",
+    "..KppppK..",
+    "..KKKKKK..",
+    ".KWWWWWwK.",
+    ".KWWWWWwK.",
+    "..KwwwwK..",
+    "..KKKKKK..",
+    ".KMWMMMmK.",
+    ".KMMMMMmK.",
+    "..KmmmmK..",
+    "...KBBK...",
+    "....BB....",
+    "....BB...."],
+  sushi:[
+    "...KKKKKKKKKK...",
+    "..KOOSOOOSOOOK..",
+    ".KOOOSOOOSOOOoK.",
+    "KoOOOOSOOOSOOooK",
+    "KWWWWWWDDWWWWWwK",
+    "KWWWWWWDdWWWWwwK",
+    "KwWWWWWDDWWWWwwK",
+    ".KwwwwwDDwwwwwK.",
+    "..KKKKKKKKKKKK.."],
+  taiyaki:[
+    ".....KKKKKK.....",
+    "...KKNNNNNNKK.KK",
+    "..KNYYNNnNNNNKNK",
+    ".KNYKNNNnNnNNNNK",
+    "KNNNNNNnNnNnNNnK",
+    "KNNNNnNnNnNnNNNK",
+    ".KnNNNNNnNnNNNnK",
+    "..KnnNNNNNNNnKnK",
+    "...KKnnnnnnnKK.K",
+    ".....KKKKKKK...."],
+  bento:[
+    "KKKKKKKKKKKKKKKK",
+    "KhRRRRRRRRRRRRrK",
+    "KRKKKKKKKKKKKKrK",
+    "KRKWWWWWKYYYYKrK",
+    "KRKWWPWWKYyYYKrK",
+    "KRKWWWWWKYYYyKrK",
+    "KRKWWWWWKKKKKKrK",
+    "KRKKKKKKKMMmMKrK",
+    "KRKOOoOOKMmMMKrK",
+    "KRKOOOoOKMMMmKrK",
+    "KRKKKKKKKKKKKKrK",
+    "KrrrrrrrrrrrrrrK",
+    "KKKKKKKKKKKKKKKK"],
+  mascot:[
+    ".......KK.......",
+    "......KcCK......",
+    "....KKCCCCKK....",
+    "...KCCCCCCCCK...",
+    "..KCCCCCCCCCCK..",
+    ".KCCCCCCCCCCCcK.",
+    ".KCCCKCCCCKCCcK.",
+    "KCCCCKCCCCKCCCcK",
+    "KCPPCCCKKCCCPPcK",
+    "KCCCCCCCCCCCCccK",
+    "KcCCCCCCCCCCcccK",
+    ".KccccccccccccK.",
+    "..KKKKKKKKKKKK.."]
+};
+function sprite(name,size){
+  const g=SPRITES[name],h=g.length,w=g[0].length;let r="";
+  g.forEach((row,y)=>[...row].forEach((c,x)=>{if(c!==".")r+=`<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${PAL[c]}"/>`}));
+  return `<svg class="sprite" viewBox="0 0 ${w} ${h}" width="${w*size}" height="${h*size}" aria-hidden="true">${r}</svg>`;
+}
+
+/* ---------- code panels ---------- */
+const code={
+predict:`from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+import asyncio
+
+app = FastAPI()
+
+async def tokens():
+    for i in range(10):
+        await asyncio.sleep(0.1)
+        yield f"tok{i} ".encode()
+
+@app.get("/stream")
+async def stream():
+    return StreamingResponse(tokens(), media_type="text/plain")`,
+review:`import time
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from .llm import fake_llm
+
+app = FastAPI()
+
+def log(msg):
+    print(msg)
+
+async def gen(prompt: str):
+    log(f"prompt={prompt}")
+    for tok in fake_llm(prompt):
+        time.sleep(0.05)  # pace the output
+        yield tok
+
+@app.get("/chat/stream")
+async def chat_stream(prompt: str):
+    # stream the answer back to the user
+    return StreamingResponse(gen(prompt))`,
+fix:`import asyncio
+from fastapi import FastAPI, Request
+from fastapi.responses import StreamingResponse
+from shared.fake_llm import fake_llm
+
+app = FastAPI()
+
+async def gen(request: Request, prompt: str):
+    # TODO: don't block the event loop
+    # TODO: stop when the client disconnects
+    async for tok in fake_llm(prompt):
+        yield tok.encode()
+
+@app.get("/chat/stream")
+async def chat_stream(request: Request, prompt: str):
+    return StreamingResponse(gen(request, prompt), media_type="text/plain")`};
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function paint(src){
+  return esc(src).split("\n").map((l,i)=>{
+    l=l.replace(/(#.*)$/,'<span class="cm">$1</span>')
+       .replace(/\b(import|from|async|def|await|for|in|return|yield)\b/g,'<span class="kw">$1</span>');
+    return `<div class="ln" data-l="${i+1}"><span class="n">${i+1}</span><span>${l}</span></div>`;
+  }).join("");
+}
+
+/* ---------- build screens ---------- */
+const chromeHtml=document.getElementById("chrome").innerHTML, sideHtml=document.getElementById("side").innerHTML;
+const order=["concept","predict","review","fix","prove","defend"];
+document.querySelectorAll("[data-step]").forEach(s=>{
+  s.insertAdjacentHTML("afterbegin",chromeHtml);
+  s.querySelector("[data-side]").outerHTML=sideHtml;
+  const cur=order.indexOf(s.dataset.step);
+  s.querySelectorAll(".step").forEach(st=>{const i=order.indexOf(st.dataset.k);if(i<cur)st.classList.add("done");if(i===cur)st.classList.add("cur")});
+});
+document.querySelectorAll("[data-code]").forEach(el=>el.innerHTML=paint(code[el.dataset.code]));
+document.querySelectorAll("[data-sprite]").forEach(el=>el.innerHTML=sprite(el.dataset.sprite,+el.dataset.size||4));
+document.getElementById("blocks").innerHTML=Array.from({length:34},(_,i)=>`<i class="${i<8?"f":""}"></i>`).join("");
+
+/* review comments */
+const rv=document.querySelector('#review [data-code]');
+function addComment(line,sev,cat,text){
+  const ln=rv.querySelector(`[data-l="${line}"]`);ln.classList.add("flag");
+  const opt=(v,list)=>list.map(o=>`<option ${o===v?"selected":""}>${o}</option>`).join("");
+  const c=document.createElement("div");c.className="comment px";
+  c.innerHTML=`<div class="row"><select>${opt(sev,["blocker","major","nit"])}</select><select>${opt(cat,["correctness","security","scale","reliability","style"])}</select></div><textarea>${text}</textarea>`;
+  ln.after(c);
+}
+addComment(14,"blocker","scale","time.sleep in an async generator blocks the event loop for every request.");
+addComment(17,"major","reliability","No media_type, and prompt has no length limit.");
+rv.addEventListener("click",e=>{const ln=e.target.closest(".ln");if(ln&&!ln.classList.contains("flag"))addComment(+ln.dataset.l,"major","correctness","")});
+
+/* navigation + theme */
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));
+  document.querySelectorAll(".mock-nav [data-s]").forEach(b=>b.classList.toggle("on",b.dataset.s===id));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(b.dataset.go));
+document.getElementById("theme").onclick=()=>{
+  const r=document.documentElement, dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;
+  r.dataset.theme=dark?"light":"dark";
+};
+</script>
+</body>
+</html>
