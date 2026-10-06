@@ -176,3 +176,29 @@ def test_ui_is_served(client):
     r = client.get("/")
     assert r.status_code == 200 and "bento-academy" in r.text
     assert client.get("/static/app.js").status_code == 200
+
+
+def test_concept_is_split_into_slides_with_story_first(client):
+    data = client.get(LESSON).json()
+    titles = [s["title"] for s in data["slides"]]
+    assert titles[0] == "The story" and "Worked example" in titles
+    assert len(data["check"]) == 3 and "answer" not in data["check"][0]
+
+
+def test_lesson_check_marks_concept_done(client):
+    r = client.post(LESSON + "/check", json={"answers": [1, 2, 0]}).json()
+    assert r["score"] == 3
+    assert r["progress"]["steps"]["concept"]["done"] is True
+
+
+def test_module_intro_and_its_check(client):
+    base = f"/api/courses/{COURSE}/modules/api-fundamentals/intro"
+    intro = client.get(base).json()
+    assert intro["slides"][0]["title"] == "The story"
+    assert len(intro["questions"]) == 4 and intro["saved"] is None
+    assert intro["first_lesson"]["lesson"] == "methods-and-status-codes"
+    r = client.post(base, json={"answers": [1, 2, 0, 2]}).json()
+    assert r["score"] == 4
+    summary = client.get(f"/api/courses/{COURSE}").json()
+    assert summary["modules"][0]["intro_done"] is True
+    assert client.get(f"/api/courses/{COURSE}/modules/streaming/intro").status_code == 404

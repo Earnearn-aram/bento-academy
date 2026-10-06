@@ -86,6 +86,13 @@ def save_quiz(course_id: str, module_id: str, quiz: QuizProgress) -> None:
         save(prog)
 
 
+def save_intro(course_id: str, module_id: str, result: QuizProgress) -> None:
+    with _lock:
+        prog = load()
+        course(prog, course_id).intros[module_id] = result
+        save(prog)
+
+
 def mark_design_viewed(course_id: str, module_id: str) -> None:
     with _lock:
         prog = load()

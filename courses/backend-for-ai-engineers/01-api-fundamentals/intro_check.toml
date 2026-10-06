@@ -1,0 +1,39 @@
+[[questions]]
+prompt = "The mobile app, the Slack bot and a partner all want your summarizer. Why do they need an **API** rather than your notebook?"
+options = [
+  "Notebooks are too slow to run a model",
+  "They need a stable contract over the network that works across languages, machines and release dates",
+  "An API makes the model's answers more accurate",
+]
+answer = 1
+explain = "An API is a contract: what to send, what comes back, and what errors look like. It lets code you'll never see depend on yours. Speed and accuracy don't change."
+
+[[questions]]
+prompt = "Your endpoint calls a model and the model times out. From the **client program's** point of view, what matters most?"
+options = [
+  "That your server logs the full stack trace",
+  "That it gets `200 OK` with an empty summary, so the app doesn't crash",
+  "That the response clearly says what happened (for example `504`), so the program can decide to retry or show a message",
+]
+answer = 2
+explain = "A program can't read your logs. It branches on the status code. `200` with an empty body says \"success\" when it wasn't, which is the bug you'll fix in lesson 1."
+
+[[questions]]
+prompt = "A model provider answers `429` (rate limit). What's the right mental model?"
+options = [
+  "An expected, temporary condition: slow down and retry later",
+  "A bug in your code that you must fix",
+  "Your API key is wrong",
+]
+answer = 0
+explain = "Anthropic's errors page lists `429` as `rate_limit_error`, and its SDK retries it with exponential backoff. You'll build careful retries in lesson 4."
+
+[[questions]]
+prompt = "Which of these do you suddenly have to care about once other programs call your code?"
+options = [
+  "Whether the model's summary is good",
+  "Writing correct Python",
+  "Many clients calling at once, and retrying the same request when they're unsure it arrived",
+]
+answer = 2
+explain = "Quality and correct code matter in a notebook too. Concurrency and retries are new: they're why status codes and idempotency matter."

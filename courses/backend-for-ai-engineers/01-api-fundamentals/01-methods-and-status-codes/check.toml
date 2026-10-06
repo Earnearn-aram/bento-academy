@@ -1,0 +1,21 @@
+[[questions]]
+prompt = "A client sends `DELETE /prompts/7`, gets no response (the network dropped it), and sends it again. Which property of DELETE makes that retry harmless?"
+options = ["DELETE is **safe**", "DELETE is **idempotent**", "DELETE is **cacheable**"]
+answer = 1
+explain = "Idempotent means one request or many have the same intended effect: prompt 7 is gone either way. DELETE is *not* safe, because it changes state."
+
+[[questions]]
+prompt = "`POST /prompts` just created a new prompt. What's the most informative response?"
+options = [
+  "`200 OK` with the prompt in the body",
+  "`204 No Content`",
+  "`201 Created`, a `Location` header pointing at it, and the prompt in the body",
+]
+answer = 2
+explain = "`201` says something new exists, and `Location` tells the client where. FastAPI won't do this for you: its default is `200`."
+
+[[questions]]
+prompt = "Someone creates a prompt called `summarize`, but one with that name already exists. The body is otherwise valid. Which status?"
+options = ["`409 Conflict`", "`422 Unprocessable Content`", "`500 Internal Server Error`"]
+answer = 0
+explain = "The request is fine; it clashes with the current state, so it's `409`. `422` is for content that is invalid in itself. `500` would mean your server crashed."

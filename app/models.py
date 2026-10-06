@@ -172,6 +172,7 @@ class Module(BaseModel):
     lessons: list[Lesson]
     has_quiz: bool
     has_design: bool
+    has_intro: bool = False  # intro.md: the story and use case, read before the first lesson
 
 
 class Course(BaseModel):
@@ -281,6 +282,7 @@ class CourseProgress(BaseModel):
     lessons: dict[str, LessonProgress] = {}
     quizzes: dict[str, QuizProgress] = {}
     designs_viewed: list[str] = []
+    intros: dict[str, QuizProgress] = {}  # module id -> intro check result
     last_lesson: str | None = None
     last_step: str | None = None
 
