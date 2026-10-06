@@ -1,5 +1,5 @@
 /* bento-academy: 16-bit food sprites on a school-notebook page. Pastel pink, sky and sage on cream.
-   Pixel font only on big headings; everything you read is a clean sans. */
+   The pixel font is only on the logo; every word you read is a clean, rounded sans. */
 :root{
   --bg:#fbfaf5; --grid:#e6e3da; --rule:#dfe7ef; --panel:#ffffff; --panel-2:#f5f3ed;
   --ink:#1f1d1a; --muted:#57534b; --link:#a3305f;
@@ -84,7 +84,7 @@ th{background:var(--panel-2)}
 body[data-view="lesson"] .announce,body[data-view="lesson"] .ticker{display:none}
 /* Highlighter pen behind big titles. */
 /* Inline + clone so a title that wraps gets a highlight stroke on every line. */
-.hl,.brandline h1,.course h2,.left>h2,.center h2{display:inline;padding:0 6px;line-height:1.5;
+.hl,.brandline h1,.course h2,.left>h2,.center h2,.slide>h2{display:inline;padding:0 6px;line-height:1.5;
   -webkit-box-decoration-break:clone;box-decoration-break:clone;
   background:linear-gradient(transparent 50%,var(--highlight) 50%,var(--highlight) 92%,transparent 92%)}
 .course h2+p,.left>h2+*{margin-top:12px}
@@ -93,12 +93,12 @@ body[data-view="lesson"] .announce,body[data-view="lesson"] .ticker{display:none
 /* ---------- home ---------- */
 .home{max-width:900px;margin:0 auto;padding:32px 16px 48px}
 .brandline{display:flex;align-items:center;gap:14px}
-.brandline h1{margin:0;font:600 32px var(--pixel)}
+.brandline h1{margin:0;font:800 32px/1.25 var(--body)}
 .home .sub{color:var(--muted);margin:6px 0 26px}
 .course{background:var(--panel);margin-bottom:26px}
 .course .head{background:var(--mint);padding:7px 16px;border-bottom:var(--px) solid var(--ink);text-align:center}
 .course .body{padding:20px;display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center}
-.course h2{margin:0 0 4px;font:600 24px var(--pixel)}
+.course h2{margin:0 0 4px;font:800 24px/1.3 var(--body)}
 .course p{margin:0 0 14px;color:var(--muted)}
 .stats{display:grid;grid-template-columns:1fr auto;gap:2px 24px;font-size:15px;margin-bottom:14px}
 .stats span:nth-child(even){text-align:right;font-weight:700}
@@ -137,11 +137,12 @@ body[data-view="lesson"] .announce,body[data-view="lesson"] .ticker{display:none
 .box{width:14px;height:14px;flex:none;outline:2px solid var(--ink);outline-offset:-2px;display:grid;place-items:center;font:800 10px var(--body);color:#fff}
 .box.done{background:var(--ok);outline-color:var(--ok)}
 .left{overflow:auto;padding:20px 24px 40px;border-right:var(--px) solid var(--ink);background:var(--panel)}
-.left h2{margin:0 0 10px;font:600 24px var(--pixel)}
+.left h2{margin:0 0 10px;font:800 24px/1.3 var(--body)}
 .left h3{margin:22px 0 6px;font:800 16px var(--body)}
 .left p{margin:0 0 10px}
+.left{font-size:17px;line-height:1.65}
 .left pre,.md pre{background:var(--code-bg);color:var(--code-ink);padding:12px;font:13px/1.55 var(--mono);overflow:auto;margin:8px var(--px) 12px;box-shadow:0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink)}
-.md h2{font:600 22px var(--pixel);margin:4px 0 10px}
+.md h2{font:800 22px/1.3 var(--body);margin:4px 0 10px}
 .md h3{font:800 16px var(--body);margin:20px 0 6px}
 .md blockquote{margin:8px 0;padding:6px 12px;background:var(--panel-2);border-left:4px solid var(--accent)}
 .md ul{padding-left:22px}
@@ -195,7 +196,7 @@ body[data-view="lesson"] .announce,body[data-view="lesson"] .ticker{display:none
 .tag{font:700 12px var(--body);padding:1px 7px;margin-left:6px;background:var(--sky);color:var(--ink);white-space:nowrap}
 .score{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 12px}
 .score>div{background:var(--panel-2);padding:8px;text-align:center;font:600 13px var(--body);color:var(--muted)}
-.score b{display:block;font:600 26px var(--pixel);color:var(--ink)}
+.score b{display:block;font:800 26px var(--body);color:var(--ink)}
 .pr{font-size:15px;color:var(--muted);padding:8px 12px;border-bottom:var(--px) solid var(--ink);background:var(--panel)}
 .pr b{color:var(--ink)}
 .badge{display:inline-block;font:700 12px var(--body);padding:2px 7px;background:var(--warn-soft);color:var(--warn);margin-left:6px}
@@ -243,3 +244,30 @@ body[data-view="lesson"] .announce,body[data-view="lesson"] .ticker{display:none
   .modules{grid-template-columns:repeat(3,1fr)}
   .prove-grid{grid-template-columns:1fr}
 }
+
+/* ---------- story, intro, nudges ---------- */
+.story{background:var(--sky-soft);padding:12px 16px;margin:4px var(--px) 18px;font-size:16px}
+.story>.label{display:block;color:var(--ink);margin-bottom:4px}
+.story p:last-child{margin-bottom:0}
+.banner-card{background:var(--mint-soft);padding:10px 14px;margin:0 var(--px) 16px;font-size:15px}
+.reading{max-width:760px}
+.reading p,.reading li{font-size:17px}
+.reading blockquote{font-size:16px}
+
+/* ---------- slide deck (concept + module intro) ---------- */
+.deck{max-width:760px}
+.deck-top{display:flex;align-items:center;gap:12px;margin:0 var(--px) 12px}
+.deck-count{font:700 13px var(--mono);color:var(--muted);min-width:44px}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+.dot{width:14px;height:14px;padding:0;border:0;cursor:pointer;background:var(--panel-2);outline:2px solid var(--ink);outline-offset:-2px}
+.dot.on{background:var(--accent)}
+.deck-viewport{overflow:hidden;transition:height .25s ease}
+.deck-track{display:flex;align-items:flex-start;transition:transform .35s ease}
+.slide{flex:0 0 100%;min-width:0;padding:6px 6px 10px;font-size:18px;line-height:1.7}
+.slide>h2{margin:0 0 14px}
+.slide .question [data-check]{margin-top:4px}
+.slide table{font-size:17px}
+.slide pre{font-size:13px}
+.deck-nav{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:2px dashed var(--grid)}
+.deck-nav .spacer{flex:1}
+@media (prefers-reduced-motion:reduce){.deck-track,.deck-viewport{transition:none}}

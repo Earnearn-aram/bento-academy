@@ -45,8 +45,43 @@ def html(text: str) -> str:
     return md.render(text)
 
 
+def md_slides(text: str) -> list[dict]:
+    """Split Markdown into slides: one per `## Heading` (text before the first heading is its own slide)."""
+    slides: list[dict] = []
+    title, buf = None, []
+    for line in text.splitlines():
+        if line.startswith("## "):
+            if title is not None or "".join(buf).strip():
+                slides.append({"title": title, "html": html("\n".join(buf))})
+            title, buf = line[3:].strip(), []
+        else:
+            buf.append(line)
+    if title is not None or "".join(buf).strip():
+        slides.append({"title": title, "html": html("\n".join(buf))})
+    return slides
+
+
+def read_slides(path: Path) -> list[dict]:
+    return md_slides(path.read_text(encoding="utf-8")) if path.is_file() else []
+
+
 def read_md(path: Path) -> str | None:
     return html(path.read_text(encoding="utf-8")) if path.is_file() else None
+
+
+def mcq_public(questions) -> list[dict]:
+    """Questions without their answers, ready for the browser."""
+    return [{"prompt": html(q.prompt), "options": [html(o) for o in q.options]} for q in questions]
+
+
+def grade_mcq(questions, answers: list[int | None]) -> tuple[list[dict], int]:
+    if len(answers) != len(questions):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Answer every question")
+    results = [
+        {"correct": a == q.answer, "answer": q.answer, "explain": html(q.explain)}
+        for a, q in zip(answers, questions, strict=True)
+    ]
+    return results, sum(r["correct"] for r in results)
 
 
 def get_course_or_404(course_id: str) -> Course:
@@ -88,6 +123,8 @@ def course_summary(course: Course) -> dict:
                 "has_design": m.has_design,
                 "quiz_done": m.meta.id in prog.quizzes,
                 "design_viewed": m.meta.id in prog.designs_viewed,
+                "has_intro": m.has_intro,
+                "intro_done": m.meta.id in prog.intros,
                 "lessons": [
                     {
                         "id": les.meta.id,
@@ -218,7 +255,16 @@ def get_lesson(course_id: str, module_id: str, lesson_id: str) -> dict:
         },
         "prev": lesson_ref(all_lessons[idx - 1]) if idx > 0 else None,
         "next": lesson_ref(all_lessons[idx + 1]) if idx + 1 < len(all_lessons) else None,
+        "story": read_md(d / "story.md"),
+        "slides": (
+            ([{"title": "The story", "html": read_md(d / "story.md"), "kind": "story"}] if (d / "story.md").is_file() else [])
+            + read_slides(d / "lesson.md")
+        ),
         "concept": read_md(d / "lesson.md") or "",
+        "check": mcq_public(load_toml(d / "check.toml", QuizFile).questions) if (d / "check.toml").is_file() else [],
+        "module_intro": (
+            {"has": module.has_intro, "done": module.meta.id in progress.course(progress.load(), course.meta.id).intros}
+        ),
         "task": read_md(d / "task.md") or "",
         "prove_task": read_md(d / "prove.md"),
         "hints": hints,
@@ -283,15 +329,41 @@ class PredictBody(BaseModel):
 def submit_predict(course_id: str, module_id: str, lesson_id: str, body: PredictBody) -> dict:
     _, lesson = get_lesson_or_404(course_id, module_id, lesson_id)
     pf = load_toml(lesson.dir / "predict.toml", PredictFile)
-    if len(body.answers) != len(pf.questions):
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Answer every question")
-    results = [
-        {"correct": a == q.answer, "answer": q.answer, "explain": html(q.explain)}
-        for a, q in zip(body.answers, pf.questions, strict=True)
-    ]
-    score = sum(r["correct"] for r in results)
+    results, score = grade_mcq(pf.questions, body.answers)
     lp = progress.mark_step(lesson, "predict", answers=body.answers, score=score, total=len(results))
     return {"results": results, "score": score, "total": len(results), "progress": lp.model_dump()}
+
+
+@app.post("/api/courses/{course_id}/lessons/{module_id}/{lesson_id}/check")
+def submit_check(course_id: str, module_id: str, lesson_id: str, body: PredictBody) -> dict:
+    """The quick understanding check at the end of the Concept step."""
+    _, lesson = get_lesson_or_404(course_id, module_id, lesson_id)
+    if not (lesson.dir / "check.toml").is_file():
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "This lesson has no understanding check")
+    qf = load_toml(lesson.dir / "check.toml", QuizFile)
+    results, score = grade_mcq(qf.questions, body.answers)
+    lp = progress.mark_step(lesson, "concept", answers=body.answers, score=score, total=len(results))
+    return {"results": results, "score": score, "total": len(results), "progress": lp.model_dump()}
+
+
+class OneAnswer(BaseModel):
+    answer: int
+
+
+def grade_one(questions, index: int, answer: int) -> dict:
+    """Grade a single question (one-question-per-slide checks). Nothing is saved."""
+    if not 0 <= index < len(questions):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such question")
+    q = questions[index]
+    return {"correct": answer == q.answer, "answer": q.answer, "explain": html(q.explain)}
+
+
+@app.post("/api/courses/{course_id}/lessons/{module_id}/{lesson_id}/check/{index}")
+def check_one(course_id: str, module_id: str, lesson_id: str, index: int, body: OneAnswer) -> dict:
+    _, lesson = get_lesson_or_404(course_id, module_id, lesson_id)
+    if not (lesson.dir / "check.toml").is_file():
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "This lesson has no understanding check")
+    return grade_one(load_toml(lesson.dir / "check.toml", QuizFile).questions, index, body.answer)
 
 
 @app.post("/api/courses/{course_id}/lessons/{module_id}/{lesson_id}/predict/run")
@@ -468,7 +540,7 @@ def get_quiz(course_id: str, module_id: str) -> dict:
     saved = progress.course(progress.load(), course_id).quizzes.get(module_id)
     return {
         "module": {"id": module.meta.id, "title": module.meta.title, "icon": module.meta.icon},
-        "questions": [{"prompt": html(q.prompt), "options": [html(o) for o in q.options]} for q in qf.questions],
+        "questions": mcq_public(qf.questions),
         "saved": saved.model_dump() if saved else None,
     }
 
@@ -480,19 +552,60 @@ def submit_quiz(course_id: str, module_id: str, body: PredictBody) -> dict:
     if module is None or not module.has_quiz:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No quiz for this module")
     qf = load_toml(module.dir / "quiz.toml", QuizFile)
-    if len(body.answers) != len(qf.questions):
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Answer every question")
-    results = [
-        {"correct": a == q.answer, "answer": q.answer, "explain": html(q.explain)}
-        for a, q in zip(body.answers, qf.questions, strict=True)
-    ]
-    score = sum(r["correct"] for r in results)
+    results, score = grade_mcq(qf.questions, body.answers)
     progress.save_quiz(
         course_id,
         module_id,
         QuizProgress(score=score, total=len(results), answers=[a if a is not None else -1 for a in body.answers]),
     )
     return {"results": results, "score": score, "total": len(results)}
+
+
+@app.get("/api/courses/{course_id}/modules/{module_id}/intro")
+def get_intro(course_id: str, module_id: str) -> dict:
+    course = get_course_or_404(course_id)
+    module = course.module(module_id)
+    if module is None or not module.has_intro:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No introduction for this module")
+    check = module.dir / "intro_check.toml"
+    saved = progress.course(progress.load(), course_id).intros.get(module_id)
+    first = module.lessons[0] if module.lessons else None
+    return {
+        "module": {"id": module.meta.id, "title": module.meta.title, "icon": module.meta.icon},
+        "html": read_md(module.dir / "intro.md"),
+        "slides": read_slides(module.dir / "intro.md"),
+        "questions": mcq_public(load_toml(check, QuizFile).questions) if check.is_file() else [],
+        "saved": saved.model_dump() if saved else None,
+        "first_lesson": lesson_ref(first),
+    }
+
+
+@app.post("/api/courses/{course_id}/modules/{module_id}/intro")
+def submit_intro(course_id: str, module_id: str, body: PredictBody) -> dict:
+    """Answer the intro check (or send no answers if the intro has none) to mark it read."""
+    course = get_course_or_404(course_id)
+    module = course.module(module_id)
+    if module is None or not module.has_intro:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No introduction for this module")
+    check = module.dir / "intro_check.toml"
+    questions = load_toml(check, QuizFile).questions if check.is_file() else []
+    results, score = grade_mcq(questions, body.answers)
+    progress.save_intro(
+        course_id,
+        module_id,
+        QuizProgress(score=score, total=len(results), answers=[a if a is not None else -1 for a in body.answers]),
+    )
+    return {"results": results, "score": score, "total": len(results)}
+
+
+@app.post("/api/courses/{course_id}/modules/{module_id}/intro/{index}")
+def intro_one(course_id: str, module_id: str, index: int, body: OneAnswer) -> dict:
+    course = get_course_or_404(course_id)
+    module = course.module(module_id)
+    check = module.dir / "intro_check.toml" if module else None
+    if check is None or not check.is_file():
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No introduction check for this module")
+    return grade_one(load_toml(check, QuizFile).questions, index, body.answer)
 
 
 @app.get("/api/courses/{course_id}/modules/{module_id}/design")

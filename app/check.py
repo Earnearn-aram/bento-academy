@@ -44,6 +44,8 @@ async def check_lesson(course: Course, lesson: Lesson, solutions_only: bool) -> 
     try:
         if (d / "interview.toml").is_file():
             load_toml(d / "interview.toml", InterviewFile)
+        if (d / "check.toml").is_file():
+            load_toml(d / "check.toml", QuizFile)
         if "predict" in lesson.steps:
             pf = load_toml(d / "predict.toml", PredictFile)
             if not (d / pf.snippet).is_file():
@@ -97,12 +99,13 @@ async def main_async(solutions_only: bool, only: str | None) -> int:
     for course in discovery.discover():
         print(f"\n🍱 {course.meta.title}")
         for module in course.modules:
-            if module.has_quiz:
-                try:
-                    load_toml(module.dir / "quiz.toml", QuizFile)
-                except ContentError as exc:
-                    failures += 1
-                    print(f"  ✗ {module.meta.id} quiz: {exc}")
+            for name in ("quiz.toml", "intro_check.toml"):
+                if (module.dir / name).is_file():
+                    try:
+                        load_toml(module.dir / name, QuizFile)
+                    except ContentError as exc:
+                        failures += 1
+                        print(f"  ✗ {module.meta.id} {name}: {exc}")
             for lesson in module.lessons:
                 if only and only not in lesson.key:
                     continue

@@ -150,10 +150,80 @@ function teardown() {
   current = null;
 }
 
+/* Slide deck: one idea per page. Back/Next, dots, and the ← → keys. Remembers the last slide per page.
+   slides: [{title, html, kind}]. Returns {el(i)} so callers can mount widgets into a slide. */
+function deck(el, slides, {key, finalNote = ""}) {
+  let i = Math.min(Math.max(+store.get("slide:" + key, 0) || 0, 0), slides.length - 1);
+  el.innerHTML = `<div class="deck">
+    <div class="deck-top"><span class="deck-count"></span><div class="dots">${slides.map((_, n) => `<button class="dot" data-n="${n}" aria-label="Slide ${n + 1}"></button>`).join("")}</div></div>
+    <div class="deck-viewport"><div class="deck-track">${slides.map(s => { const story = s.kind === "story" || s.title === "The story";
+      return `<section class="slide md">${s.title ? `<h2>${esc(s.title)}</h2>` : ""}${story ? `<div class="story px">${s.html}</div>` : s.html}</section>`; }).join("")}</div></div>
+    <div class="deck-nav"><button class="btn" data-prev>◀ Back</button><span class="spacer"></span><span class="note deck-final">${finalNote}</span><button class="btn primary" data-next>Next ▶</button></div></div>`;
+  const track = $(".deck-track", el), viewport = $(".deck-viewport", el), secs = $$(".slide", el);
+  function go(n) {
+    i = Math.min(Math.max(n, 0), slides.length - 1);
+    track.style.transform = `translateX(-${i * 100}%)`;
+    viewport.style.height = secs[i].offsetHeight + "px";
+    secs.forEach((s, k) => s.setAttribute("aria-hidden", k !== i));
+    $$(".dot", el).forEach((d, k) => d.classList.toggle("on", k <= i));
+    $(".deck-count", el).textContent = `${i + 1} / ${slides.length}`;
+    $("[data-prev]", el).disabled = i === 0;
+    $("[data-next]", el).classList.toggle("hidden", i === slides.length - 1);
+    $(".deck-final", el).classList.toggle("hidden", i !== slides.length - 1);
+    store.set("slide:" + key, i);
+    const scroller = el.closest(".left"); if (scroller) scroller.scrollTop = 0;
+  }
+  $("[data-prev]", el).onclick = () => go(i - 1);
+  $("[data-next]", el).onclick = () => go(i + 1);
+  $$(".dot", el).forEach(d => d.onclick = () => go(+d.dataset.n));
+  const onKey = e => {
+    if (!document.body.contains(el)) return document.removeEventListener("keydown", onKey);
+    if (e.target.closest("input,textarea,select,.monaco-editor")) return;
+    if (e.key === "ArrowRight") go(i + 1); else if (e.key === "ArrowLeft") go(i - 1);
+  };
+  document.addEventListener("keydown", onKey);
+  const ro = new ResizeObserver(() => { viewport.style.height = secs[i].offsetHeight + "px"; });
+  secs.forEach(s => ro.observe(s));
+  requestAnimationFrame(() => go(i));
+  return {el: n => secs[n], resize: () => { viewport.style.height = secs[i].offsetHeight + "px"; }};
+}
+
+/* One question per slide. Each "Check" grades that question at once (gradeOne);
+   when every question is answered, saveAll(answers) records the result. */
+function questionSlides(prefix, questions) {
+  return questions.map((q, qi) => ({
+    title: `Quick check ${qi + 1} of ${questions.length}`, kind: "check",
+    html: `<div class="question" id="${prefix}${qi}"><div class="prompt">${q.prompt}</div>
+      ${q.options.map((o, oi) => `<label class="opt"><input type="radio" name="${prefix}${qi}" value="${oi}">${o}</label>`).join("")}
+      <button class="btn primary" type="button" data-check>Check</button><div class="explain hidden"></div></div>`,
+  }));
+}
+function wireQuestionSlides(prefix, questions, {saved, gradeOne, saveAll, onDone, resize}) {
+  const answers = questions.map((_, qi) => (saved ? saved[qi] : null));
+  const show = (qi, res, picked) => {
+    const box = $("#" + prefix + qi);
+    $$(".opt", box).forEach((o, oi) => { o.classList.toggle("right-ans", oi === res.answer); o.classList.toggle("wrong-ans", oi === picked && !res.correct); });
+    const ex = $(".explain", box); ex.innerHTML = (res.correct ? "<b>✓ Correct.</b> " : "<b>✗ Not quite.</b> ") + res.explain; ex.classList.remove("hidden");
+    resize && resize();
+  };
+  questions.forEach((_, qi) => {
+    const box = $("#" + prefix + qi);
+    if (saved && saved[qi] != null) { const r = $(`input[value="${saved[qi]}"]`, box); if (r) r.checked = true; }
+    $("[data-check]", box).onclick = async () => {
+      const c = $(`input[name=${prefix}${qi}]:checked`, box);
+      if (!c) return toast("Pick an answer first.");
+      answers[qi] = +c.value;
+      show(qi, await gradeOne(qi, answers[qi]), answers[qi]);
+      if (!answers.includes(null)) { const r = await saveAll(answers); onDone && onDone(r); }
+    };
+  });
+}
+
 function courseSidebar(course, here) {
   let out = "";
   for (const m of course.modules) {
     out += `<h4>${sprite(m.icon, 1)}${esc(m.title)}</h4>`;
+    if (m.has_intro) out += `<a class="extra ${here && here.intro === m.id ? "cur" : ""}" href="#/intro/${course.id}/${m.id}"><span class="box ${m.intro_done ? "done" : ""}">${m.intro_done ? "✓" : ""}</span>Introduction</a>`;
     for (const l of m.lessons) {
       const cur = here && here.module === m.id && here.lesson === l.id;
       out += `<a class="${cur ? "cur" : ""}" href="#/learn/${course.id}/${m.id}/${l.id}"><span class="box ${l.done ? "done" : ""}">${l.done ? "✓" : ""}</span>${esc(l.title)}${l.updated ? '<span class="upd" title="This lesson changed since you finished it">updated</span>' : ""}</a>`;
@@ -205,7 +275,8 @@ async function renderHome() {
         <div class="blocks">${Array.from({length: c.lessons_total}, (_, k) => `<i class="${k < c.lessons_done ? "f" : ""}"></i>`).join("")}</div>
       </div></div>
       <div class="modules">${c.modules.map(m => {
-        const l = firstOpen(m); const href = l ? `#/learn/${c.id}/${m.id}/${l.id}` : "#/";
+        const l = firstOpen(m);
+        const href = m.has_intro && !m.intro_done ? `#/intro/${c.id}/${m.id}` : l ? `#/learn/${c.id}/${m.id}/${l.id}` : "#/";
         const cls = m.done === m.total && m.total ? "" : (m.done > 0 || (c.last && c.last.module === m.id)) ? "cur" : "fresh";
         return `<a class="mod ${cls}" href="${href}"><div class="art">${sprite(m.icon, 3)}</div><div class="name">${esc(m.short)}</div><div class="st">${m.total ? `${m.done}/${m.total}${m.done === m.total ? " ✓" : ""}` : "soon"}</div></a>`;
       }).join("")}</div></div>`;
@@ -253,15 +324,26 @@ function markChip(step) { const chip = $$(".step").find(a => a.getAttribute("hre
 
 /* --- concept */
 async function viewConcept({left, right, L, nextBtn, base}) {
-  left.innerHTML = L.concept + nextBtn;
-  const labels = {concept: "Read the idea and the worked example.", predict: "Guess what some code does, then run it.",
+  const introNudge = L.module_intro.has && !L.module_intro.done
+    ? `<div class="banner-card px">New to <b>${esc(L.module.title)}</b>? Read the <a href="#/intro/${L.course.id}/${L.module.id}">module introduction</a> first: the story and why it matters.</div>` : "";
+  const saved = L.progress.steps.concept && L.progress.steps.concept.data.answers;
+  const slides = L.slides.slice();
+  slides.push(...questionSlides("cq", L.check));
+  slides.push({title: "Next up", html: `<p>You've got the idea. Now use it: predict what some code does, then review a real PR.</p><div id="cnext" class="${L.check.length && !saved ? "hidden" : ""}">${nextBtn}</div>${L.check.length && !saved ? `<p class="note" id="cwait">Answer the quick checks on the previous slides to continue.</p>` : ""}`, kind: "end"});
+  left.innerHTML = introNudge + `<div id="deck"></div>`;
+  const d = deck($("#deck"), slides, {key: `${L.course.id}:${L.lesson.key}:concept`});
+  if (L.check.length) wireQuestionSlides("cq", L.check, {saved, resize: () => d.resize(),
+    gradeOne: (qi, answer) => api("POST", `${base}/check/${qi}`, {answer}),
+    saveAll: answers => api("POST", base + "/check", {answers}),
+    onDone: () => { $("#cnext").classList.remove("hidden"); const w = $("#cwait"); w && w.remove(); d.resize(); markChip("concept"); refreshSidebar(); }});
+  const labels = {concept: "Read the story, the idea and a worked example, then answer a quick check.", predict: "Guess what some code does, then run it.",
     review: "Review a pull request and flag what's wrong.", fix: "Fix the code until the tests pass.",
     prove: "Write one test that catches the bug.", defend: "Answer senior interview questions."};
   right.innerHTML = `<div class="scroll md mission"><h2>${esc(L.lesson.title)}</h2><p class="note">${esc(L.lesson.summary)} · about ${L.lesson.minutes} min</p>
     <div class="task px"><span class="label">Your mission</span>${L.task}</div>
     <h3>How this lesson works</h3><ol>${L.lesson.steps.map(s => `<li><b>${STEP_LABEL[s]}</b>: ${labels[s]}</li>`).join("")}</ol>
     <div class="bubble">${sprite("mascot", 3)}<div class="say px">Your code lives in <code>${esc(L.exercise_dir)}/</code>. Edit it here or in your own IDE; both stay in sync.</div></div></div>`;
-  if (!(L.progress.steps.concept && L.progress.steps.concept.done)) {
+  if (!L.check.length && !(L.progress.steps.concept && L.progress.steps.concept.done)) {
     api("POST", base + "/steps/concept/done").then(() => { markChip("concept"); refreshSidebar(); }).catch(() => {});
   }
 }
@@ -534,6 +616,23 @@ async function renderQuiz(courseId, moduleId) {
   };
 }
 
+async function renderIntro(courseId, moduleId) {
+  const [I, course] = await Promise.all([api("GET", `/api/courses/${courseId}/modules/${moduleId}/intro`), api("GET", `/api/courses/${courseId}`)]);
+  const start = I.first_lesson ? `<a class="btn primary drop" href="#/learn/${courseId}/${I.first_lesson.module}/${I.first_lesson.lesson}">Start: ${esc(I.first_lesson.title)} ▸</a>` : `<a class="btn" href="#/">Lessons coming soon · Home</a>`;
+  app.innerHTML = `<div class="top"><span class="crumbs"><a href="#/">${esc(course.title)}</a> › ${esc(I.module.title)} › <b>Introduction</b></span></div>
+    <div class="layout wide-left">${courseSidebar(course, {intro: moduleId})}<div class="left md" style="grid-column:span 2"><div class="reading">
+    <div class="brandline">${sprite(I.module.icon, 3)}<h2>${esc(I.module.title)}</h2></div><div id="ideck" style="margin-top:14px"></div></div></div></div>`;
+  const islides = I.slides.slice();
+  islides.push(...questionSlides("iq", I.questions));
+  islides.push({title: "Ready?", html: `<p>That's the big picture. Each lesson now adds one small box to it.</p><div id="inext" class="${I.questions.length && !I.saved ? "hidden" : ""}">${start}</div>${I.questions.length && !I.saved ? `<p class="note" id="iwait">Answer the quick checks on the previous slides first.</p>` : ""}`, kind: "end"});
+  const d = deck($("#ideck"), islides, {key: `${courseId}:${moduleId}:intro`});
+  const done = async () => { $("#inext").classList.remove("hidden"); const w = $("#iwait"); w && w.remove(); d.resize(); const side = $(".side"); if (side) side.outerHTML = courseSidebar(await api("GET", `/api/courses/${courseId}`), {intro: moduleId}); };
+  if (I.questions.length) wireQuestionSlides("iq", I.questions, {saved: I.saved && I.saved.answers, resize: () => d.resize(),
+    gradeOne: (qi, answer) => api("POST", `/api/courses/${courseId}/modules/${moduleId}/intro/${qi}`, {answer}),
+    saveAll: answers => api("POST", `/api/courses/${courseId}/modules/${moduleId}/intro`, {answers}), onDone: done});
+  else if (!I.saved) api("POST", `/api/courses/${courseId}/modules/${moduleId}/intro`, {answers: []}).then(done).catch(() => {});
+}
+
 async function renderDesign(courseId, moduleId) {
   const [D, course] = await Promise.all([api("GET", `/api/courses/${courseId}/modules/${moduleId}/design`), api("GET", `/api/courses/${courseId}`)]);
   const key = `design:${courseId}:${moduleId}`;
@@ -551,11 +650,12 @@ async function route() {
   teardown();
   const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
   // Full-height work screens hide the decorative strips; CSS reads this flag.
-  document.body.dataset.view = ["learn", "quiz", "design"].includes(parts[0]) ? "lesson" : "home";
+  document.body.dataset.view = ["learn", "quiz", "design", "intro"].includes(parts[0]) ? "lesson" : "home";
   try {
     if (parts[0] === "learn" && parts.length >= 4) await renderLesson(parts[1], parts[2], parts[3], parts[4]);
     else if (parts[0] === "quiz" && parts.length === 3) await renderQuiz(parts[1], parts[2]);
     else if (parts[0] === "design" && parts.length === 3) await renderDesign(parts[1], parts[2]);
+    else if (parts[0] === "intro" && parts.length === 3) await renderIntro(parts[1], parts[2]);
     else await renderHome();
     window.scrollTo(0, 0);
   } catch (err) {
