@@ -550,6 +550,8 @@ async function renderDesign(courseId, moduleId) {
 async function route() {
   teardown();
   const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
+  // Full-height work screens hide the decorative strips; CSS reads this flag.
+  document.body.dataset.view = ["learn", "quiz", "design"].includes(parts[0]) ? "lesson" : "home";
   try {
     if (parts[0] === "learn" && parts.length >= 4) await renderLesson(parts[1], parts[2], parts[3], parts[4]);
     else if (parts[0] === "quiz" && parts.length === 3) await renderQuiz(parts[1], parts[2]);

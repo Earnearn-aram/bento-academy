@@ -1,36 +1,46 @@
-/* bento-academy: cozy 16-bit UI. Pixel font only on big headings; everything you read is a clean sans. */
+/* bento-academy: 16-bit food sprites on a school-notebook page. Pastel pink, sky and sage on cream.
+   Pixel font only on big headings; everything you read is a clean sans. */
 :root{
-  --bg:#e4d9c9; --panel:#fbf6ec; --panel-2:#f1e8d8; --ink:#4a3b2c; --muted:#6f604c;
-  --accent:#e0784f; --accent-ink:#ffffff; --accent-soft:#f7dccd; --mint:#dbe7d2;
-  --ok:#5b7a4f; --ok-soft:#dbe7d2; --bad:#c84a3a; --bad-soft:#f6d9d2; --warn:#a87a22; --warn-soft:#f5e6c4;
-  --shadow:#cbbda8;
+  --bg:#fbfaf5; --grid:#e6e3da; --rule:#dfe7ef; --panel:#ffffff; --panel-2:#f5f3ed;
+  --ink:#1f1d1a; --muted:#57534b; --link:#a3305f;
+  --accent:#f4a3bd; --accent-ink:#1f1d1a; --accent-soft:#fde3ec; --highlight:#f9c6d6;
+  --sky:#b9e1ea; --sky-soft:#e3f3f7; --mint:#c7dc9f; --mint-soft:#e9f2d9;
+  --ok:#436b2a; --ok-soft:#e9f2d9; --bad:#b2352c; --bad-soft:#fbe4e1; --warn:#8a6414; --warn-soft:#fbefcf;
+  --shadow:#dcd8cd;
   --code-bg:#2e2a24; --code-ink:#f1e7d3; --code-muted:#8a7d6a; --code-hl:#4a3a2c; --code-kw:#f0a070;
   --code-cm:#9fbf8a; --code-st:#e9c98f; --code-nu:#f4a6b8; --code-de:#c7b3f0;
   --missed:#5a2a24; --found:#2f4a2a;
   --px:3px;
-  --hi:rgba(255,255,255,.6); --lo:rgba(74,59,44,.16);
+  --hi:rgba(255,255,255,.7); --lo:rgba(31,29,26,.12);
   --pixel:"Pixelify Sans",ui-monospace,monospace;
   --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  --header-h:48px; --top-h:48px;
+  --header-h:52px; --top-h:48px; --strip-h:26px;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#231e19; --panel:#2f2822; --panel-2:#3a3129; --ink:#efe3cf; --muted:#b3a28a;
-  --accent:#f08a5d; --accent-soft:#4a3125; --mint:#34402f; --ok:#9cc48a; --ok-soft:#2f3d2a;
-  --bad:#f08272; --bad-soft:#4a2620; --warn:#e8bd5f; --warn-soft:#45381c; --shadow:#16120e;
-  --code-bg:#1b1814; --hi:rgba(255,255,255,.07); --lo:rgba(0,0,0,.35); color-scheme:dark;
+  --bg:#1d1c1a; --grid:#2b2a26; --rule:#33363a; --panel:#262522; --panel-2:#302e2a;
+  --ink:#f1eee6; --muted:#aaa49a; --link:#f4a3bd;
+  --accent:#f4a3bd; --accent-ink:#1f1d1a; --accent-soft:#4a2c37; --highlight:#6e3a4d;
+  --sky:#2f4a52; --sky-soft:#253338; --mint:#323d2a; --mint-soft:#2b3326;
+  --ok:#9cc48a; --ok-soft:#2b3326; --bad:#f08a80; --bad-soft:#4a2620; --warn:#e8bd5f; --warn-soft:#45381c;
+  --shadow:#111110; --code-bg:#1b1814; --hi:rgba(255,255,255,.07); --lo:rgba(0,0,0,.35); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#231e19; --panel:#2f2822; --panel-2:#3a3129; --ink:#efe3cf; --muted:#b3a28a;
-  --accent:#f08a5d; --accent-soft:#4a3125; --mint:#34402f; --ok:#9cc48a; --ok-soft:#2f3d2a;
-  --bad:#f08272; --bad-soft:#4a2620; --warn:#e8bd5f; --warn-soft:#45381c; --shadow:#16120e;
-  --code-bg:#1b1814; --hi:rgba(255,255,255,.07); --lo:rgba(0,0,0,.35); color-scheme:dark;
+  --bg:#1d1c1a; --grid:#2b2a26; --rule:#33363a; --panel:#262522; --panel-2:#302e2a;
+  --ink:#f1eee6; --muted:#aaa49a; --link:#f4a3bd;
+  --accent:#f4a3bd; --accent-ink:#1f1d1a; --accent-soft:#4a2c37; --highlight:#6e3a4d;
+  --sky:#2f4a52; --sky-soft:#253338; --mint:#323d2a; --mint-soft:#2b3326;
+  --ok:#9cc48a; --ok-soft:#2b3326; --bad:#f08a80; --bad-soft:#4a2620; --warn:#e8bd5f; --warn-soft:#45381c;
+  --shadow:#111110; --code-bg:#1b1814; --hi:rgba(255,255,255,.07); --lo:rgba(0,0,0,.35); color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;font:16px/1.6 var(--body);background:var(--bg);color:var(--ink)}
-a{color:var(--accent)}
+/* Graph paper: two hairlines every 24px. Reading panels stay plain so the grid never sits under text. */
+body{margin:0;font:16px/1.6 var(--body);color:var(--ink);background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px}
+a{color:var(--link)}
 code{font-family:var(--mono);font-size:.86em;background:var(--panel-2);padding:0 4px}
 pre code{background:none;padding:0;font-size:inherit}
 svg.sprite{image-rendering:pixelated;shape-rendering:crispEdges;display:block;flex:none}
@@ -51,7 +61,9 @@ th{background:var(--panel-2)}
 .btn:active{transform:translateY(var(--px));box-shadow:0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink),inset 3px 3px 0 0 var(--lo),inset -3px -3px 0 0 var(--hi)}
 .btn:disabled{opacity:.55;cursor:progress}
 .btn.primary{background:var(--accent);color:var(--accent-ink)}
-.btn.primary:hover{filter:brightness(1.06)}
+.btn.primary:hover{filter:brightness(1.04)}
+/* The little dot before the label, like a sticker on a pill button. */
+.btn.primary::before{content:"";display:inline-block;width:8px;height:8px;margin:0 8px 2px 0;background:var(--panel);outline:2px solid var(--ink);vertical-align:middle}
 .btn.drop{box-shadow:0 calc(-1*var(--px)) 0 0 var(--ink),0 var(--px) 0 0 var(--ink),calc(-1*var(--px)) 0 0 0 var(--ink),var(--px) 0 0 0 var(--ink),0 calc(3*var(--px)) 0 0 var(--shadow),inset 3px 3px 0 0 var(--hi),inset -3px -3px 0 0 var(--lo)}
 .btn small{font-size:11px;opacity:.85;font-weight:600}
 .btn.small{font-size:13px;padding:3px 9px}
@@ -60,10 +72,23 @@ th{background:var(--panel-2)}
 .note{font-size:15px}
 
 /* ---------- app header ---------- */
-.appbar{height:var(--header-h);display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--ink);color:var(--bg)}
-.appbar a.brand{display:flex;align-items:center;gap:10px;color:var(--bg);text-decoration:none;font:600 20px var(--pixel)}
+.appbar{height:var(--header-h);display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--panel);color:var(--ink);border-bottom:var(--px) solid var(--ink)}
+.appbar a.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font:600 22px var(--pixel)}
 .appbar .spacer{flex:1}
 .appbar .btn{font-size:13px;padding:3px 10px}
+/* School strips: a sky announcement line on top and a sage ticker under the header (home pages only). */
+.announce,.ticker{height:var(--strip-h);display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;font:700 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.announce{background:var(--sky);border-bottom:2px dashed var(--ink)}
+.ticker{background:var(--mint);border-bottom:var(--px) solid var(--ink);justify-content:flex-start}
+.ticker span{padding-right:28px}
+body[data-view="lesson"] .announce,body[data-view="lesson"] .ticker{display:none}
+/* Highlighter pen behind big titles. */
+/* Inline + clone so a title that wraps gets a highlight stroke on every line. */
+.hl,.brandline h1,.course h2,.left>h2,.center h2{display:inline;padding:0 6px;line-height:1.5;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;
+  background:linear-gradient(transparent 50%,var(--highlight) 50%,var(--highlight) 92%,transparent 92%)}
+.course h2+p,.left>h2+*{margin-top:12px}
+.tool .btn.primary::before{display:none} /* toolbar buttons already start with ▶ */
 
 /* ---------- home ---------- */
 .home{max-width:900px;margin:0 auto;padding:32px 16px 48px}
@@ -99,10 +124,10 @@ th{background:var(--panel-2)}
 .step{font:600 13px var(--body);padding:3px 9px;background:var(--panel);color:var(--muted);text-decoration:none;cursor:pointer}
 .step.done{background:var(--ok-soft);color:var(--ok)}
 .step.done::before{content:"✓ "}
-.step.cur{background:var(--accent);color:#fff}
+.step.cur{background:var(--accent);color:var(--accent-ink)}
 .layout{display:grid;grid-template-columns:260px minmax(0,1fr) minmax(0,1.15fr);height:calc(100vh - var(--header-h) - var(--top-h) - 3px)}
 .layout.wide-left{grid-template-columns:260px minmax(0,1.2fr) minmax(0,1fr)}
-.side{border-right:var(--px) solid var(--ink);overflow:auto;padding:8px 10px 24px;background:var(--panel)}
+.side{border-right:var(--px) solid var(--ink);overflow:auto;padding:8px 10px 24px;background:transparent} /* the notebook grid shows through the lesson list */
 .side h4{margin:14px 4px 4px;display:flex;align-items:center;gap:8px;font:700 13px var(--body);color:var(--muted)}
 .side a{display:flex;gap:8px;align-items:center;padding:3px 8px;color:var(--ink);text-decoration:none;font-size:15px;line-height:1.35}
 .side a:hover{background:var(--panel-2)}
@@ -121,7 +146,7 @@ th{background:var(--panel-2)}
 .md blockquote{margin:8px 0;padding:6px 12px;background:var(--panel-2);border-left:4px solid var(--accent)}
 .md ul{padding-left:22px}
 .task{background:var(--accent-soft);padding:10px 14px;margin:10px var(--px)}
-.task>.label{display:block;color:var(--accent);margin-bottom:2px}
+.task>.label{display:block;color:var(--link);margin-bottom:2px}
 .task ul{margin:4px 0;padding-left:20px}
 .fold{background:var(--panel);margin:14px var(--px)}
 .fold summary{padding:8px 12px;cursor:pointer;font:700 15px var(--body);list-style:none;display:flex;align-items:center;gap:8px}
@@ -167,7 +192,7 @@ th{background:var(--panel-2)}
 .chk .why{display:block;color:var(--bad);font-size:15px}
 .chk details{font-size:13px;color:var(--muted)}
 .chk details pre{white-space:pre-wrap;font:12px/1.45 var(--mono);background:var(--panel-2);padding:8px;max-height:260px;overflow:auto}
-.tag{font:700 12px var(--body);padding:1px 7px;margin-left:6px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.tag{font:700 12px var(--body);padding:1px 7px;margin-left:6px;background:var(--sky);color:var(--ink);white-space:nowrap}
 .score{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 12px}
 .score>div{background:var(--panel-2);padding:8px;text-align:center;font:600 13px var(--body);color:var(--muted)}
 .score b{display:block;font:600 26px var(--pixel);color:var(--ink)}
@@ -186,7 +211,11 @@ th{background:var(--panel-2)}
 .explain p{margin:0}
 .bubble{display:flex;gap:12px;align-items:flex-end;margin:16px 0}
 .bubble .say{background:var(--panel);padding:8px 12px;font-size:15px}
-.answer{width:calc(100% - 2*var(--px));min-height:90px;background:var(--panel-2);color:var(--ink);border:0;padding:8px;font:16px/1.5 var(--body)}
+/* Ruled notebook paper with a pink margin line, only where you write. */
+.answer{width:calc(100% - 2*var(--px));min-height:96px;color:var(--ink);border:0;padding:0 10px 0 44px;font:16px/24px var(--body);
+  background-color:var(--panel);background-attachment:local;
+  background-image:linear-gradient(90deg,transparent 30px,var(--accent) 30px,var(--accent) 32px,transparent 32px),
+    repeating-linear-gradient(transparent 0,transparent 23px,var(--rule) 23px,var(--rule) 24px)}
 .win{background:var(--ok-soft);padding:12px 14px;margin:18px var(--px);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 .output{white-space:pre-wrap;font:13px/1.5 var(--mono);margin:0}
 .prove-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
