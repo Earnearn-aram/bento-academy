@@ -1,0 +1,7 @@
+[[questions]]
+prompt = "A teammate says the second `DELETE /prompts/7` must return `204`, not `404`, \"otherwise DELETE isn't idempotent\". Are they right?"
+answer = """
+**On the definition, no.** Idempotency is about the effect on the server, not the response. MDN's own example of an idempotent DELETE returns 200, then 404. After one call or ten, prompt 7 is gone.
+
+**On what to ship, it's a trade-off:** `404` is honest and catches client bugs; `204` every time keeps automatic retries quiet. Pick one, document it, and use it everywhere *(opinion)*.
+"""

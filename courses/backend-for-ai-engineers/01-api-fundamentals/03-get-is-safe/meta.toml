@@ -1,0 +1,34 @@
+id = "get-is-safe"
+title = "GET never changes anything"
+summary = "Reading must be harmless. To delete, use the DELETE method."
+minutes = 12
+version = 1
+optional_steps = ["prove", "defend"]
+
+[[goals]]
+id = "g1"
+text = "`DELETE /prompts/{id}` removes the prompt and returns `204 No Content` with an empty body."
+
+[[goals]]
+id = "g2"
+text = "Deleting an id that doesn't exist returns `404`, never `500`."
+
+[[goals]]
+id = "g3"
+text = "`GET` requests never delete anything."
+
+[[sources]]
+title = "MDN: HTTP request methods (safe / idempotent table)"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods"
+
+[[sources]]
+title = "MDN Glossary: Safe (HTTP methods)"
+url = "https://developer.mozilla.org/en-US/docs/Glossary/Safe/HTTP"
+
+[[sources]]
+title = "MDN: DELETE"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/DELETE"
+
+[[sources]]
+title = "MDN: 204 No Content"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/204"

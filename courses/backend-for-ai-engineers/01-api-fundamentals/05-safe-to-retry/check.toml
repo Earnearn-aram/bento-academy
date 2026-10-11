@@ -1,0 +1,11 @@
+[[questions]]
+prompt = "What does **idempotent** mean?"
+options = ["The request is fast", "Sending it twice has the same effect as sending it once", "The request can't fail"]
+answer = 1
+explain = "Like pressing a lift button twice: the lift still comes once."
+
+[[questions]]
+prompt = "The app retries `POST /prompts` after a dropped reply, and the first one *did* arrive. What happens?"
+options = ["Nothing, POST is idempotent", "Two prompts get created", "The server returns 409 automatically"]
+answer = 1
+explain = "POST isn't idempotent: each one creates something. (Here our duplicate-name check from lesson 4 would catch it, but in general POST retries need care.)"

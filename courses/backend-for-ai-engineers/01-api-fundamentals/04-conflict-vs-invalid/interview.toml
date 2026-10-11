@@ -1,0 +1,8 @@
+[[questions]]
+prompt = "Create can fail because the name is taken, or because `template` is empty. Which codes, and why does the difference matter?"
+answer = """
+- **Empty or missing template → `422`.** The content is wrong; resending it unchanged fails again (MDN 422). FastAPI does this from the Pydantic model.
+- **Name taken → `409`.** The request is valid but clashes with current state; it could succeed later (MDN 409).
+
+The client can branch without parsing messages: field errors on `422`, "choose another name" on `409`. Using `400` for both throws that information away *(opinion)*.
+"""

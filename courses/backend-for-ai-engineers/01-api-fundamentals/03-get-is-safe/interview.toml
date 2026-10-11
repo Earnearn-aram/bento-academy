@@ -1,0 +1,9 @@
+[[questions]]
+prompt = "Why is `GET /prompts/7/delete` dangerous even when only logged-in users can use it?"
+answer = """
+- **Tools send GETs on their own:** browser pre-loading, crawlers (both named by MDN), chat link previews *(my addition)*.
+- **Other sites can trigger it:** with cookie login, an `<img src=".../prompts/7/delete">` on any page makes the user's browser send it (CSRF) *(general security practice)*.
+- **Retries and caches** assume GET can be repeated with no side effects.
+
+Login checks *who* is calling; it doesn't help when the user's own browser is tricked. Use `DELETE`.
+"""

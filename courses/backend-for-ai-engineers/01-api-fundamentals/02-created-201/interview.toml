@@ -1,0 +1,9 @@
+[[questions]]
+prompt = "Why bother with `201` and `Location` if the client gets the new prompt in the body anyway?"
+answer = """
+- **Different clients, one contract.** Generic tools (SDK generators, API gateways, logging) understand `201` and `Location` without knowing anything about *our* body shape.
+- **Monitoring.** A dashboard can count creates (`201`) separately from reads (`200`).
+- **Less coupling.** If the body changes later, the address still comes from a standard header.
+
+*(The reasoning is mine; the meanings of 201 and Location come from MDN.)*
+"""

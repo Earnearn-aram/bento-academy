@@ -1,0 +1,30 @@
+id = "safe-to-retry"
+title = "Safe to retry"
+summary = "Sending it twice should have the same effect as sending it once."
+minutes = 12
+version = 1
+optional_steps = ["prove", "defend"]
+
+[[goals]]
+id = "g1"
+text = "`PUT /prompts/1` replaces prompt 1 and returns it with `200` (already works: keep it working)."
+
+[[goals]]
+id = "g2"
+text = "Sending the same PUT twice gives the same result as sending it once (already works: keep it working)."
+
+[[goals]]
+id = "g3"
+text = "`PUT` on an id that doesn't exist returns `404` and creates nothing."
+
+[[sources]]
+title = "MDN Glossary: Idempotent"
+url = "https://developer.mozilla.org/en-US/docs/Glossary/Idempotent"
+
+[[sources]]
+title = "MDN: HTTP request methods (safe / idempotent table)"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods"
+
+[[sources]]
+title = "MDN: PUT"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/PUT"

@@ -1,0 +1,14 @@
+intro = "Two create routes. Guess the status each one returns, then press **Run it**."
+snippet = "predict/snippet.py"
+
+[[questions]]
+prompt = "**Q1.** `POST /v1/notes` has no `status_code` set. What does the client get?"
+options = ["`201`, because it's a POST", "`200`", "`204`"]
+answer = 1
+explain = "FastAPI's default is `200` for every route. It doesn't look at the method."
+
+[[questions]]
+prompt = "**Q2.** `POST /v2/notes` has `status_code=201`. Does the client also get a `Location` header?"
+options = ["Yes, FastAPI adds it automatically", "Only if the code sets `response.headers[\"Location\"]`"]
+answer = 1
+explain = "The status code and the header are separate. You must set `Location` yourself."

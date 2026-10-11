@@ -1,0 +1,27 @@
+title = "Add read-only prompt library API"
+author = "junior"
+description = """
+**PR by a junior dev:** "Adds endpoints to list prompts and get one by id. Tested in Swagger: `/prompts/1` works 👍"
+"""
+goal = "There is 1 problem to find. Click the line where it happens and leave a comment."
+hint = "Play it in your head: someone asks for prompt **99**. What does `get_prompt` return? What status code goes with it?"
+model_review = """
+**Request changes.**
+
+- 🔴 **Must fix, line 21:** an unknown id returns `200 OK` with `null`. The mobile app trusts the `200` and shows an empty prompt. Raise `HTTPException(status_code=404)` when the id isn't in `prompts`.
+
+Everything else looks good. `/prompts/1` works because that prompt exists; it's the *missing* case that wasn't tried.
+"""
+teaching_comment = """
+> Line 21: what should the app see when it asks for prompt 99? Right now it gets `200` and `null`, which says "success, and the prompt is empty". Could you raise `HTTPException(status_code=404)` when the id isn't there? The FastAPI "Handling Errors" page shows the exact pattern.
+
+Ask a question first, then explain why, then point to where to learn more.
+"""
+
+[[issues]]
+id = "missing-200-null"
+lines = [19, 21]
+severity = "blocker"
+category = "correctness"
+title = "Unknown id returns 200 with null"
+explanation = "`prompts.get()` returns `None`. FastAPI sends it as `null` with the default `200`. Raise `HTTPException(404)` instead."

@@ -1,0 +1,14 @@
+intro = "Two delete routes. Guess what happens when the id doesn't exist, then press **Run it**."
+snippet = "predict/snippet.py"
+
+[[questions]]
+prompt = "**Q1.** `DELETE /v1/notes/9` runs `del notes[9]`, and note 9 doesn't exist. What does the client get?"
+options = ["`404`", "`500 Internal Server Error`", "`204`"]
+answer = 1
+explain = "`del` on a missing key raises `KeyError`. Nothing catches it, so FastAPI answers `500`."
+
+[[questions]]
+prompt = "**Q2.** `DELETE /v2/notes/9` checks first and raises `HTTPException(404)`. What now?"
+options = ["`404` with a `detail`", "`500`", "`405`"]
+answer = 0
+explain = "Checking first turns a crash into a clear answer."

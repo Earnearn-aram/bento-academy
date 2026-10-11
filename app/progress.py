@@ -44,7 +44,8 @@ def update_lesson(les: Lesson, fn) -> LessonProgress:
         prog = load()
         lp = lesson(prog, les.course_id, les.key)
         fn(lp)
-        if all(lp.steps.get(s) and lp.steps[s].done for s in les.steps):
+        required = [s for s in les.steps if s not in les.meta.optional_steps]
+        if all(lp.steps.get(s) and lp.steps[s].done for s in required):
             if not lp.completed:
                 lp.completed = True
             lp.completed_version = les.meta.version
@@ -83,6 +84,13 @@ def save_quiz(course_id: str, module_id: str, quiz: QuizProgress) -> None:
     with _lock:
         prog = load()
         course(prog, course_id).quizzes[module_id] = quiz
+        save(prog)
+
+
+def save_intro(course_id: str, module_id: str, result: QuizProgress) -> None:
+    with _lock:
+        prog = load()
+        course(prog, course_id).intros[module_id] = result
         save(prog)
 
 

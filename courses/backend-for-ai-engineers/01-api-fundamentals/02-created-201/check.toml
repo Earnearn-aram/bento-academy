@@ -1,0 +1,11 @@
+[[questions]]
+prompt = "A client creates a prompt with `POST /prompts`. Which reply is most helpful?"
+options = ["`200 OK` with the prompt", "`201 Created`, a `Location` header, and the prompt", "`204 No Content`"]
+answer = 1
+explain = "`201` says \"something new exists\", `Location` says where, and the body saves an extra request."
+
+[[questions]]
+prompt = "What does the `Location` header hold after a create?"
+options = ["The server's address", "The address of the new prompt, like `/prompts/3`", "The time it was created"]
+answer = 1
+explain = "It points at the thing that was just created, so the client can fetch it directly."

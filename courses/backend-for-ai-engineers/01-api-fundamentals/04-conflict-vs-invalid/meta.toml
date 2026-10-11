@@ -1,0 +1,30 @@
+id = "conflict-vs-invalid"
+title = "Clash or bad input? 409 vs 422"
+summary = "A duplicate name is a clash with what exists (409), not bad input (422)."
+minutes = 12
+version = 1
+optional_steps = ["prove", "defend"]
+
+[[goals]]
+id = "g1"
+text = "Creating a prompt with a name that already exists returns `409 Conflict`."
+
+[[goals]]
+id = "g2"
+text = "The duplicate is **not** saved."
+
+[[goals]]
+id = "g3"
+text = "A body with a missing field still gets `422`, and a new name still gets `201` (both already work: keep them working)."
+
+[[sources]]
+title = "MDN: 409 Conflict"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"
+
+[[sources]]
+title = "MDN: 422 Unprocessable Content"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"
+
+[[sources]]
+title = "FastAPI: Request Body"
+url = "https://fastapi.tiangolo.com/tutorial/body/"

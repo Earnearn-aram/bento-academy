@@ -118,6 +118,7 @@ def _load_course(course_dir: Path) -> Course:
                 lessons=lessons,
                 has_quiz=(module_dir / "quiz.toml").is_file(),
                 has_design=(module_dir / "design.md").is_file(),
+                has_intro=(module_dir / "intro.md").is_file(),
             )
         )
     return Course(meta=meta, dir=course_dir, modules=modules)

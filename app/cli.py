@@ -45,7 +45,9 @@ def cmd_new_lesson(args) -> None:
         sys.exit(f"{lesson_dir} already exists")
     files = {
         "meta.toml": f'id = "{slug}"\ntitle = "{slug.replace("-", " ").capitalize()}"\nsummary = ""\nminutes = 25\nversion = 1\n\n[[sources]]\ntitle = ""\nurl = ""\n',
-        "lesson.md": "## The idea\n\n(Under 300 words.)\n\n## Worked example\n\n```python\n```\n",
+        "story.md": "A short, concrete scenario: what went wrong for whom, and why it matters.\n",
+        "lesson.md": "## The idea\n\nOne idea per `##` section: each section becomes one slide (under 300 words in total).\n\n## Worked example\n\n```python\n```\n",
+        "check.toml": '[[questions]]\nprompt = ""\noptions = ["", "", ""]\nanswer = 0\nexplain = ""\n',
         "task.md": "What to build or fix, as a short list.\n",
         "prove.md": "The bug to prove, in two sentences.\n",
         "hints.md": "Hint 1\n---\nHint 2\n---\nHint 3\n",

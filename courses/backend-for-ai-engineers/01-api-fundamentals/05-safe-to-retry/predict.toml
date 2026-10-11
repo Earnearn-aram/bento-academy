@@ -1,0 +1,14 @@
+intro = "Send each request twice. Guess the result, then press **Run it**."
+snippet = "predict/snippet.py"
+
+[[questions]]
+prompt = "**Q1.** `POST /items` twice with the same body. How many items exist?"
+options = ["1", "2"]
+answer = 1
+explain = "POST creates each time. It's not idempotent."
+
+[[questions]]
+prompt = "**Q2.** `PUT /items/1` twice with the same body. How many items exist?"
+options = ["1", "2"]
+answer = 0
+explain = "PUT replaces item 1 both times: same result as once. It's idempotent."

@@ -1,0 +1,14 @@
+intro = "Two versions of the same route. Guess what each one answers for a note that doesn't exist, then press **Run it**."
+snippet = "predict/snippet.py"
+
+[[questions]]
+prompt = "**Q1.** `GET /v1/notes/7` (note 7 doesn't exist). What status comes back?"
+options = ["`404`", "`200`, with the body `null`", "`500`"]
+answer = 1
+explain = "`notes.get(7)` gives `None`, FastAPI sends it as `null`, and the status is still the default `200`."
+
+[[questions]]
+prompt = "**Q2.** `GET /v2/notes/7`, which raises `HTTPException(404)`. What comes back?"
+options = ["`404` with a `detail` message", "`200` with `null`", "The server crashes"]
+answer = 0
+explain = "`HTTPException` is FastAPI's way to say \"stop and send this error\". The client gets `404` and `{\"detail\": ...}`."

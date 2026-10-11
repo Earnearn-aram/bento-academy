@@ -1,0 +1,204 @@
+# Plain-English meanings. The app underlines the first use of each term on a slide;
+# hover or tap it to see this. Terms written in CAPS (GET, API) match only in caps.
+
+[[terms]]
+term = "API"
+aliases = ["APIs"]
+plain = "A set of addresses a program can call to ask another program for something."
+analogy = "A restaurant menu: you don't go into the kitchen, you order from the menu and get a dish back."
+
+[[terms]]
+term = "endpoint"
+aliases = ["endpoints", "route", "routes"]
+plain = "One address of an API, like /prompts/2, together with a method such as GET."
+analogy = "One item on the menu."
+example = "GET /prompts/2"
+
+[[terms]]
+term = "request"
+aliases = ["requests"]
+plain = "The message a client sends to the server: a method, an address, and sometimes a body."
+analogy = "Your order to the waiter."
+
+[[terms]]
+term = "response"
+aliases = ["responses"]
+plain = "The message the server sends back: a status code, headers, and usually a body."
+analogy = "The dish (or the waiter saying \"sorry, we're out\")."
+
+[[terms]]
+term = "client"
+aliases = ["clients", "caller", "callers"]
+plain = "Any program that calls the API: a website, a mobile app, a script, another service."
+analogy = "The customer in the restaurant."
+
+[[terms]]
+term = "status code"
+aliases = ["status codes"]
+plain = "A three-digit number at the top of every response that says how it went."
+analogy = "A thumbs up or thumbs down before you read the details."
+example = "200 = OK, 404 = not found, 500 = the server broke"
+
+[[terms]]
+term = "method"
+aliases = ["methods", "HTTP method", "HTTP methods", "verb"]
+plain = "The word at the start of a request that says what you want to do: GET, POST, PUT or DELETE."
+analogy = "Read, add, replace, or throw away."
+
+[[terms]]
+term = "GET"
+plain = "Read something. It must never change anything on the server."
+analogy = "Looking at the menu. Looking twice doesn't order food."
+example = "GET /prompts/2"
+
+[[terms]]
+term = "POST"
+plain = "Create something new. Sending it twice may create two things."
+analogy = "Placing an order. Say it twice and you might get two dishes."
+example = "POST /prompts  {\"name\": \"summarize\", ...}"
+
+[[terms]]
+term = "PUT"
+plain = "Replace the thing at this exact address with what I send."
+analogy = "\"Make table 4's order exactly this.\" Saying it twice changes nothing more."
+example = "PUT /prompts/2  {\"name\": \"summarize\", ...}"
+
+[[terms]]
+term = "DELETE"
+plain = "Remove the thing at this address."
+analogy = "\"Cancel order 2.\" Cancelling it again doesn't cancel anything else."
+example = "DELETE /prompts/2"
+
+[[terms]]
+term = "200"
+plain = "OK: it worked, and here is the result."
+
+[[terms]]
+term = "201"
+plain = "Created: something new now exists. Usually comes with a Location header saying where."
+
+[[terms]]
+term = "204"
+plain = "No Content: it worked, and there's nothing to send back (common after a delete)."
+
+[[terms]]
+term = "404"
+plain = "Not Found: there is nothing at that address."
+analogy = "\"Sorry, there's no table 99 in this restaurant.\""
+
+[[terms]]
+term = "405"
+plain = "Method Not Allowed: the address exists, but not for that method."
+
+[[terms]]
+term = "409"
+plain = "Conflict: your request is fine on its own, but it clashes with what's already there."
+analogy = "Booking a table that someone else already booked."
+
+[[terms]]
+term = "422"
+plain = "Unprocessable: the request itself is broken, like a missing field or a wrong type."
+analogy = "An order form with the dish name left blank."
+
+[[terms]]
+term = "500"
+plain = "Internal Server Error: the server crashed. It's never the client's fault, and it's never the right answer on purpose."
+
+[[terms]]
+term = "header"
+aliases = ["headers"]
+plain = "A short name: value line sent alongside the body, with extra information about the message."
+analogy = "The label on a parcel, not what's inside it."
+example = "Location: /prompts/3"
+
+[[terms]]
+term = "Location header"
+aliases = ["Location"]
+plain = "A header that tells the client the address of the thing that was just created."
+example = "Location: /prompts/3"
+
+[[terms]]
+term = "body"
+plain = "The main content of a request or response, usually JSON."
+analogy = "What's inside the parcel."
+
+[[terms]]
+term = "JSON"
+plain = "A simple text format for data: {\"name\": \"summarize\"}. Almost every web API speaks it."
+
+[[terms]]
+term = "safe"
+aliases = ["safe method", "safe methods"]
+plain = "A method is safe when calling it never changes anything on the server. GET is safe."
+analogy = "Reading a book doesn't change the book."
+
+[[terms]]
+term = "idempotent"
+aliases = ["idempotency"]
+plain = "Doing it twice has the same result as doing it once."
+analogy = "Pressing the lift button again doesn't call a second lift."
+example = "PUT and DELETE are idempotent. POST is not."
+
+[[terms]]
+term = "retry"
+aliases = ["retries", "retried", "retrying"]
+plain = "Sending the same request again because the first try failed or got no answer."
+analogy = "Calling back when the phone line drops."
+
+[[terms]]
+term = "timeout"
+aliases = ["timeouts", "timed out"]
+plain = "Giving up after waiting a fixed time for an answer."
+
+[[terms]]
+term = "HTTPException"
+plain = "FastAPI's way to stop and send an error response with a chosen status code."
+example = "raise HTTPException(status_code=404, detail=\"Prompt 9 not found\")"
+
+[[terms]]
+term = "detail"
+plain = "The human-readable error message FastAPI puts in the response body."
+example = "{\"detail\": \"Prompt 9 not found\"}"
+
+[[terms]]
+term = "Pydantic"
+aliases = ["Pydantic model", "BaseModel"]
+plain = "A Python library that checks incoming data has the right fields and types, and rejects it with 422 when it doesn't."
+example = "class PromptIn(BaseModel):\n    name: str"
+
+[[terms]]
+term = "FastAPI"
+plain = "The Python web framework used in this course. You write functions; it turns them into endpoints."
+
+[[terms]]
+term = "decorator"
+aliases = ["decorators"]
+plain = "The @ line above a function. In FastAPI it connects the function to a method and an address."
+example = "@app.get(\"/prompts\")"
+
+[[terms]]
+term = "path parameter"
+aliases = ["path parameters"]
+plain = "A part of the address that changes, written in curly braces in the route."
+example = "/prompts/{prompt_id}  →  /prompts/2"
+
+[[terms]]
+term = "PR"
+aliases = ["pull request", "pull requests", "PRs"]
+plain = "A proposed code change that teammates read and comment on before it's merged."
+analogy = "A draft essay handed in for marking."
+
+[[terms]]
+term = "code review"
+aliases = ["reviewing"]
+plain = "Reading someone's change to find bugs and risks before it ships."
+
+[[terms]]
+term = "crawler"
+aliases = ["crawlers", "prefetch", "link preview"]
+plain = "A program that visits web addresses on its own, for example to build a search index or a chat link preview."
+analogy = "Someone flipping through every page of a catalogue, without buying anything."
+
+[[terms]]
+term = "upsert"
+plain = "Update the thing if it exists, otherwise create it."

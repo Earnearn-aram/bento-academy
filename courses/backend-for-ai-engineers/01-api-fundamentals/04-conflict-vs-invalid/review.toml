@@ -1,0 +1,23 @@
+title = "Polish prompt creation"
+author = "junior"
+description = """
+**PR by a junior dev:** "Create now returns 201 and a Location header, like we learned. Ready to merge 👍"
+"""
+goal = "There is 1 problem to find. Think about what happens when two prompts share a name."
+hint = "The chatbot loads prompts **by name**. What stops two prompts from both being called `summarize`?"
+model_review = """
+**Request changes.** 201 and Location look great.
+
+- 🟠 **Should fix, line 36:** nothing stops a second `summarize` prompt, and the chatbot loads by name. Check first and raise `HTTPException(409)`.
+"""
+teaching_comment = """
+> Line 36: what happens if someone creates a second prompt called `summarize`? The chatbot loads by name, so it could pick the wrong one. Could we check for an existing name and answer `409 Conflict`? MDN's 409 page describes this case.
+"""
+
+[[issues]]
+id = "duplicate-name"
+lines = [36, 37]
+severity = "major"
+category = "correctness"
+title = "Duplicate names are accepted"
+explanation = "Nothing checks for an existing prompt with the same name. Check first and raise `409 Conflict`."
