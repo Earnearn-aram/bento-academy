@@ -1,0 +1,34 @@
+id = "not-found-404"
+title = "Not found means 404"
+summary = "When something doesn't exist, say so: 404, not 'OK'."
+minutes = 12
+version = 1
+optional_steps = ["prove", "defend"]
+
+[[goals]]
+id = "g1"
+text = "A prompt that exists still comes back with `200 OK` (this already works: keep it working)."
+
+[[goals]]
+id = "g2"
+text = "A prompt that doesn't exist returns `404 Not Found`."
+
+[[goals]]
+id = "g3"
+text = "The 404 says what's missing, like `{\"detail\": \"Prompt 99 not found\"}`."
+
+[[sources]]
+title = "MDN: HTTP response status codes"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status"
+
+[[sources]]
+title = "MDN: 404 Not Found"
+url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404"
+
+[[sources]]
+title = "FastAPI: Handling Errors"
+url = "https://fastapi.tiangolo.com/tutorial/handling-errors/"
+
+[[sources]]
+title = "FastAPI: Testing"
+url = "https://fastapi.tiangolo.com/tutorial/testing/"

@@ -1,10 +1,12 @@
 🍱 bento-academy: learn one small box at a time.
 
-A local, Codecademy-style app for learning by doing. Each lesson is one small idea. You predict what some code does, review a pull request, fix it until real tests pass, write a test that proves the bug, and then defend your design like in a senior interview.
+A local, Codecademy-style app for learning by doing. Each lesson is one small idea. You predict what some code does, review a pull request, and fix it until real tests pass. For extra depth, you can write a test that proves the bug and defend your design like in a senior interview.
 
 First course: **Backend for AI engineers** (APIs, streaming, SSE, WebSocket, webhooks, and a capstone).
 
-> Status: milestone 0. The app and lesson 1.1 are ready; the rest of the course is being added module by module.
+> Status: the first 5 small lessons of **API basics** are ready (10–15 minutes each). The rest of the course is being added module by module.
+
+Stuck on a word? Words with a dotted underline show a plain-English meaning when you hover or tap them. A lesson is complete after Concept, Predict, Review and Fix; Prove and Defend are ⭐ bonus steps.
 
 ## Start
 

@@ -1,0 +1,11 @@
+[[questions]]
+prompt = "Which request might a browser or chat app send **on its own**, without anyone clicking a button?"
+options = ["`GET`", "`DELETE`", "`POST`"]
+answer = 0
+explain = "`GET` is a safe method, so tools feel free to send it for previews and pre-loading. That's why a GET must never change data."
+
+[[questions]]
+prompt = "A DELETE worked and there's nothing to send back. Which status fits best?"
+options = ["`200 OK` with `null`", "`204 No Content`", "`201 Created`"]
+answer = 1
+explain = "`204` means \"done, and there's no body\"."

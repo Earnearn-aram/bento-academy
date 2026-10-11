@@ -16,7 +16,7 @@ options = [
   "That the response clearly says what happened (for example `504`), so the program can decide to retry or show a message",
 ]
 answer = 2
-explain = "A program can't read your logs. It branches on the status code. `200` with an empty body says \"success\" when it wasn't, which is the bug you'll fix in lesson 1."
+explain = "A program can't read your logs. It branches on the status code. `200` with an empty body says \"success\" when it wasn't. You'll fix exactly this kind of bug in lesson 1."
 
 [[questions]]
 prompt = "A model provider answers `429` (rate limit). What's the right mental model?"
@@ -26,7 +26,7 @@ options = [
   "Your API key is wrong",
 ]
 answer = 0
-explain = "Anthropic's errors page lists `429` as `rate_limit_error`, and its SDK retries it with exponential backoff. You'll build careful retries in lesson 4."
+explain = "Anthropic's errors page lists `429` as `rate_limit_error`, and its SDK retries it with exponential backoff. You'll build careful retries in the Resilient APIs module."
 
 [[questions]]
 prompt = "Which of these do you suddenly have to care about once other programs call your code?"
@@ -36,4 +36,4 @@ options = [
   "Many clients calling at once, and retrying the same request when they're unsure it arrived",
 ]
 answer = 2
-explain = "Quality and correct code matter in a notebook too. Concurrency and retries are new: they're why status codes and idempotency matter."
+explain = "Quality and correct code matter in a notebook too. Concurrency and retries are new: they're why clear status codes and \"safe to retry\" matter."

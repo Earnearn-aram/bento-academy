@@ -9,13 +9,13 @@ from app.review import grade
 from app.server import app
 
 COURSE = "backend-for-ai-engineers"
-LESSON = f"/api/courses/{COURSE}/lessons/api-fundamentals/methods-and-status-codes"
+LESSON = f"/api/courses/{COURSE}/lessons/api-fundamentals/not-found-404"
 
 
 @pytest.fixture
 def client():
     progress.reset()
-    lesson = discovery.get_course(COURSE).find("api-fundamentals", "methods-and-status-codes")
+    lesson = discovery.get_course(COURSE).find("api-fundamentals", "not-found-404")
     shutil.rmtree(lesson.exercise_dir, ignore_errors=True)
     with TestClient(app) as c:
         yield c
@@ -23,7 +23,7 @@ def client():
 
 @pytest.fixture
 def lesson():
-    return discovery.get_course(COURSE).find("api-fundamentals", "methods-and-status-codes")
+    return discovery.get_course(COURSE).find("api-fundamentals", "not-found-404")
 
 
 def test_discovers_course_and_lesson(client):
@@ -31,8 +31,9 @@ def test_discovers_course_and_lesson(client):
     assert [c["id"] for c in courses] == [COURSE]
     modules = courses[0]["modules"]
     assert modules[0]["id"] == "api-fundamentals"
-    assert modules[0]["lessons"][0]["id"] == "methods-and-status-codes"
-    assert [m["icon"] for m in modules] == ["onigiri", "ramen", "dango", "sushi", "taiyaki", "bento"]
+    assert [l["id"] for l in modules[0]["lessons"]] == [
+        "not-found-404", "created-201", "get-is-safe", "conflict-vs-invalid", "safe-to-retry"]
+    assert [m["icon"] for m in modules] == ["onigiri", "gyoza", "ramen", "dango", "sushi", "taiyaki", "bento"]
 
 
 def test_unknown_course_and_lesson_are_404(client):
@@ -44,7 +45,7 @@ def test_lesson_payload_hides_answers(client):
     data = client.get(LESSON).json()
     assert data["lesson"]["steps"] == ["concept", "predict", "review", "fix", "prove", "defend"]
     assert "answer" not in data["predict"]["questions"][0]
-    assert "issues" not in data["review"] and data["review"]["issue_count"] == 7
+    assert "issues" not in data["review"] and data["review"]["issue_count"] == 1
     assert {f["name"] for f in data["files"]} == {"main.py", "test_prove.py"}
     assert isinstance(data["files"][0]["mtime_ns"], str), "mtimes must be strings (JS numbers lose precision)"
 
@@ -124,41 +125,72 @@ def test_prove(client, lesson):
 
 
 def test_predict_scoring(client):
-    r = client.post(LESSON + "/predict", json={"answers": [1, 2, 0]}).json()
-    assert r["score"] == 2 and r["total"] == 3
-    assert [x["correct"] for x in r["results"]] == [True, True, False]
+    r = client.post(LESSON + "/predict", json={"answers": [1, 1]}).json()
+    assert r["score"] == 1 and r["total"] == 2
+    assert [x["correct"] for x in r["results"]] == [True, False]
     assert client.post(LESSON + "/predict", json={"answers": [1]}).status_code == 422
 
 
-def test_review_grading_rules(lesson):
+def test_review_grading_rules():
+    lesson = discovery.get_course(COURSE).find("api-fundamentals", "get-is-safe")
     rubric = discovery.load_toml(lesson.dir / "review.toml", ReviewFile)
     comments = [
-        ReviewComment(line=36, severity="blocker", category="correctness", text="200 null"),
-        ReviewComment(line=45, severity="blocker", category="correctness", text="GET deletes"),
+        ReviewComment(line=42, severity="blocker", category="correctness", text="GET deletes"),
         ReviewComment(line=12, severity="nit", category="style", text="false alarm"),
     ]
     result = grade(rubric, comments)
     by_id = {r.issue.id: r for r in result.issues}
-    assert by_id["missing-200-null"].found and by_id["missing-200-null"].category_match
     assert by_id["get-deletes"].found and not by_id["get-deletes"].category_match  # it's security
     assert not by_id["delete-keyerror"].found
     assert [c.line for c in result.false_alarms] == [12]
-    # One comment can't count for two neighbouring issues (lines 25-26 and 28-29).
-    one = grade(rubric, [ReviewComment(line=27, severity="major", category="correctness")])
+    # One comment can't count for two neighbouring issues (lines 42 and 44).
+    one = grade(rubric, [ReviewComment(line=43, severity="major", category="security")])
     assert sum(r.found for r in one.issues) == 1
 
 
-def test_lesson_completes_when_every_step_is_done(client, lesson):
-    for step in ("concept",):
-        client.post(LESSON + f"/steps/{step}/done")
+def test_review_category_is_optional():
+    lesson = discovery.get_course(COURSE).find("api-fundamentals", "get-is-safe")
+    rubric = discovery.load_toml(lesson.dir / "review.toml", ReviewFile)
+    result = grade(rubric, [ReviewComment(line=42, text="a crawler would delete prompts")])  # no severity/category
+    hit = next(r for r in result.issues if r.issue.id == "get-deletes")
+    assert hit.found and hit.your_comment.category == "not_sure" and not hit.category_match
+
+
+def test_review_hint_and_goals_in_payload(client):
+    data = client.get(LESSON).json()
+    assert data["review"]["hint"]
+    assert [g["id"] for g in data["lesson"]["goals"]] == ["g1", "g2", "g3"]
+    assert data["lesson"]["optional_steps"] == ["prove", "defend"]
+
+
+def test_checks_report_their_goal(client, lesson):
+    client.get(LESSON)
+    run = client.post(LESSON + "/run", json={"kind": "core"}).json()
+    assert {c["goal"] for c in run["checks"]} == {"g1", "g2", "g3"}
+
+
+def test_glossary(client):
+    terms = client.get(f"/api/courses/{COURSE}/glossary").json()
+    by = {t["term"]: t for t in terms}
+    assert "idempotent" in by and by["idempotent"]["analogy"]
+    assert all(t["plain"] for t in terms)
+
+
+def test_lesson_completes_without_bonus_steps(client, lesson):
+    client.post(LESSON + "/steps/concept/done")
     assert client.post(LESSON + "/steps/fix/done").status_code == 409  # fix is earned by passing tests
-    for step in ("predict", "review", "fix", "prove"):
+    for step in ("predict", "review"):
         progress.mark_step(lesson, step)
-    lp = client.post(LESSON + "/steps/defend/done").json()
-    assert lp["completed"] is True
+    assert not progress.load().courses[COURSE].lessons[lesson.key].completed
+    progress.mark_step(lesson, "fix")  # prove and defend are bonus steps
+    assert progress.load().courses[COURSE].lessons[lesson.key].completed  # persisted to disk
     summary = client.get(f"/api/courses/{COURSE}").json()
     assert summary["lessons_done"] == 1
-    assert progress.load().courses[COURSE].lessons[lesson.key].completed  # persisted to disk
+    assert summary["modules"][0]["lessons"][0]["bonus_done"] is False
+    progress.mark_step(lesson, "prove")
+    client.post(LESSON + "/steps/defend/done")
+    summary = client.get(f"/api/courses/{COURSE}").json()
+    assert summary["modules"][0]["lessons"][0]["bonus_done"] is True
 
 
 def test_corrupt_progress_file_does_not_break_the_app(client):
@@ -182,12 +214,12 @@ def test_concept_is_split_into_slides_with_story_first(client):
     data = client.get(LESSON).json()
     titles = [s["title"] for s in data["slides"]]
     assert titles[0] == "The story" and "Worked example" in titles
-    assert len(data["check"]) == 3 and "answer" not in data["check"][0]
+    assert len(data["check"]) == 2 and "answer" not in data["check"][0]
 
 
 def test_lesson_check_marks_concept_done(client):
-    r = client.post(LESSON + "/check", json={"answers": [1, 2, 0]}).json()
-    assert r["score"] == 3
+    r = client.post(LESSON + "/check", json={"answers": [1, 2]}).json()
+    assert r["score"] == 2
     assert r["progress"]["steps"]["concept"]["done"] is True
 
 
@@ -196,7 +228,7 @@ def test_module_intro_and_its_check(client):
     intro = client.get(base).json()
     assert intro["slides"][0]["title"] == "The story"
     assert len(intro["questions"]) == 4 and intro["saved"] is None
-    assert intro["first_lesson"]["lesson"] == "methods-and-status-codes"
+    assert intro["first_lesson"]["lesson"] == "not-found-404"
     r = client.post(base, json={"answers": [1, 2, 0, 2]}).json()
     assert r["score"] == 4
     summary = client.get(f"/api/courses/{COURSE}").json()

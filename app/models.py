@@ -70,6 +70,11 @@ class ModuleFile(ContentModel):
     icon: str = "onigiri"
 
 
+class Goal(ContentModel):
+    id: str
+    text: str
+
+
 class LessonFile(ContentModel):
     """meta.toml"""
 
@@ -81,6 +86,10 @@ class LessonFile(ContentModel):
     steps: list[StepName] | None = None  # None = course default
     files: list[str] = ["main.py"]  # editable files; the first one is the entry module
     prove_file: str = "test_prove.py"
+    # Steps shown as "Bonus": they earn a star but don't block completing the lesson.
+    optional_steps: list[StepName] = []
+    # Fix-step checklist. Tests opt in with @pytest.mark.goal("<id>").
+    goals: list[Goal] = []
     sources: list[Source] = []
 
 
@@ -126,6 +135,7 @@ class ReviewFile(ContentModel):
     issues: list[ReviewIssue] = Field(min_length=1)
     model_review: str
     teaching_comment: str | None = None  # how a Lead would phrase one comment for a junior
+    hint: str | None = None  # where to look, for the Review step's Hint button
 
 
 class InterviewQuestion(ContentModel):
@@ -137,6 +147,20 @@ class InterviewFile(ContentModel):
     """interview.toml"""
 
     questions: list[InterviewQuestion] = Field(min_length=1, max_length=3)
+
+
+class GlossaryEntry(ContentModel):
+    term: str
+    plain: str  # one sentence, no jargon
+    analogy: str | None = None  # an everyday comparison
+    example: str | None = None  # a tiny bit of code or HTTP
+    aliases: list[str] = []  # other spellings that should get the same popup
+
+
+class GlossaryFile(ContentModel):
+    """glossary.toml (one per course)"""
+
+    terms: list[GlossaryEntry] = Field(min_length=1)
 
 
 class QuizQuestion(PredictQuestion):
@@ -205,6 +229,7 @@ class Check(BaseModel):
     message: str = ""
     details: str = ""
     best_practice: bool = False
+    goal: str | None = None
     duration_s: float = 0.0
 
     @property
@@ -235,8 +260,9 @@ class ProveResult(BaseModel):
 
 class ReviewComment(BaseModel):
     line: int
-    severity: Severity
-    category: Category
+    severity: Severity = "major"
+    # "not_sure" is allowed: finding the right line is what counts while you learn the labels.
+    category: Category | Literal["not_sure"] = "not_sure"
     text: str = ""
 
 

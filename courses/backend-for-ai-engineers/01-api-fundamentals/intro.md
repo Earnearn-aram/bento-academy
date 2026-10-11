@@ -21,22 +21,22 @@ None of them can import your notebook. They use different languages, run on diff
 
 ## Why this matters for an AI engineer
 
-LLM features fail in API-shaped ways. Anthropic's API, for example, answers `429` when you hit a rate limit, `504` when a request times out and `529` when it is overloaded. Its official SDK retries these with exponential backoff. Calls are slow and cost money, so a careless retry doubles the bill. Prompts and keys are sensitive.
+LLM features fail in API-shaped ways. When you call Anthropic's API too fast, it answers `429` ("slow down"). When a request takes too long, it answers `504`. Its official SDK knows these codes and tries again later on its own. That only works because the API says clearly what went wrong.
 
-Senior interviews probe exactly this: *"What does your endpoint return when the model times out? What happens if the client retries? How do you know who called?"*
+Model calls are also slow and cost money, so sending the same request twice by accident costs twice as much.
+
+Senior interviews ask exactly this: *"What does your endpoint return when the model times out? What happens if the client tries again?"*
 
 ## What you'll build
 
-A small **LLM gateway**: one service your teams call instead of calling model providers directly. Each lesson adds one piece:
+A small **prompt library API**: one place where your teams store and share prompt templates. Each lesson is one small box, about 10–15 minutes:
 
-1. **Methods & status codes:** its prompt library says exactly what happened.
-2. **Pydantic models:** bad input is rejected at the door, and secrets never leak into responses.
-3. **Async vs sync:** one slow model call doesn't freeze everyone else.
-4. **Timeouts & retries:** survive a flaky upstream without making it worse.
-5. **Error handling:** one consistent error shape; upstream failures become `502` / `504`.
-6. **Pagination:** long lists come back in pages that never skip or repeat.
-7. **Auth: API key & JWT:** know who is calling.
+1. **Not found means 404:** asking for a prompt that doesn't exist says "not found", not "OK".
+2. **Created means 201:** adding a prompt says "created" and where to find it.
+3. **GET never changes anything:** reading is always harmless; deleting uses `DELETE`.
+4. **Clash or bad input?** A duplicate name is a `409` clash, not a `422` broken request.
+5. **Safe to retry:** sending the same request twice does no extra harm.
 
-*Lessons 2–7 are being written; lesson 1 is ready now.*
+*Coming next, in the same small steps: rejecting bad input with Pydantic, not leaking secrets, then a module on resilient APIs (slow calls, timeouts, retries, errors, pages and auth).*
 
 > Sources: the status codes above are from Anthropic's [API errors](https://docs.claude.com/en/api/errors) page.

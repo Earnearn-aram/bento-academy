@@ -1,0 +1,32 @@
+title = "Let teams delete prompts"
+author = "junior"
+description = """
+**PR by a junior dev:** "Adds a delete link so people can remove old prompts. You can just open `/prompts/7/delete` in the browser, super handy 👍"
+"""
+goal = "There are 2 problems to find. Click each line and leave a comment."
+hint = "Two questions: which **method** does this route use, and is that method allowed to change data? Then: what happens on line with `del` when the id doesn't exist?"
+model_review = """
+**Request changes.**
+
+- 🔴 **Must fix, line 42:** delete is a `GET`. Link previews and crawlers send GETs on their own, so one pasted link deletes a prompt. Use `@app.delete("/prompts/{prompt_id}", status_code=204)`.
+- 🟠 **Should fix, line 44:** an unknown id raises `KeyError` → `500`. Call `get_or_404(prompt_id)` first.
+"""
+teaching_comment = """
+> Line 42: "handy in the browser" is exactly the risk: anything that can open a link (Slack previews, crawlers) will delete prompts. Could we use the DELETE method here? MDN's "Safe (HTTP methods)" page explains why GET has to stay read-only.
+"""
+
+[[issues]]
+id = "get-deletes"
+lines = [42, 42]
+severity = "blocker"
+category = "security"
+title = "Delete is done with GET"
+explanation = "GET must be safe: browsers, crawlers and chat apps send it on their own. Use `@app.delete(...)`."
+
+[[issues]]
+id = "delete-keyerror"
+lines = [44, 44]
+severity = "major"
+category = "reliability"
+title = "Unknown id crashes with 500"
+explanation = "`del` on a missing key raises `KeyError`, which becomes a `500`. Call `get_or_404()` first."

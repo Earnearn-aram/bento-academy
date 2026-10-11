@@ -1,0 +1,15 @@
+[[questions]]
+prompt = "An app asks for prompt `42`, which doesn't exist. Which answer is right?"
+options = ["`200 OK` with the body `null`", "`404 Not Found` with \"Prompt 42 not found\"", "`500 Internal Server Error`"]
+answer = 1
+explain = "`404` tells the app clearly that prompt 42 doesn't exist. `500` would mean your server crashed, which isn't what happened."
+
+[[questions]]
+prompt = "Nothing crashed. So why is `200` with `null` a problem?"
+options = [
+  "It's slower than a 404",
+  "`null` isn't valid JSON",
+  "The app trusts `200`, so it thinks it got a real (empty) prompt",
+]
+answer = 2
+explain = "Apps read the status code first. `200` means \"it worked\". (`null` *is* valid JSON, which is why nothing crashed.)"

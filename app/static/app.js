@@ -7,6 +7,7 @@
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const inline = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");  // plain text with `code`
 const app = document.getElementById("app");
 const STEP_LABEL = {concept: "Concept", predict: "Predict", review: "Review", fix: "Fix", prove: "Prove", defend: "Defend"};
 const MONACO_CDN = "https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs";
@@ -226,7 +227,7 @@ function courseSidebar(course, here) {
     if (m.has_intro) out += `<a class="extra ${here && here.intro === m.id ? "cur" : ""}" href="#/intro/${course.id}/${m.id}"><span class="box ${m.intro_done ? "done" : ""}">${m.intro_done ? "✓" : ""}</span>Introduction</a>`;
     for (const l of m.lessons) {
       const cur = here && here.module === m.id && here.lesson === l.id;
-      out += `<a class="${cur ? "cur" : ""}" href="#/learn/${course.id}/${m.id}/${l.id}"><span class="box ${l.done ? "done" : ""}">${l.done ? "✓" : ""}</span>${esc(l.title)}${l.updated ? '<span class="upd" title="This lesson changed since you finished it">updated</span>' : ""}</a>`;
+      out += `<a class="${cur ? "cur" : ""}" href="#/learn/${course.id}/${m.id}/${l.id}"><span class="box ${l.done ? "done" : ""}">${l.done ? "✓" : ""}</span>${esc(l.title)}${l.bonus_done ? '<span class="star" title="Bonus steps done">⭐</span>' : ""}${l.updated ? '<span class="upd" title="This lesson changed since you finished it">updated</span>' : ""}</a>`;
     }
     if (m.has_quiz) out += `<a class="extra ${here && here.quiz === m.id ? "cur" : ""}" href="#/quiz/${course.id}/${m.id}"><span class="box ${m.quiz_done ? "done" : ""}">${m.quiz_done ? "✓" : ""}</span>Quiz</a>`;
     if (m.has_design) out += `<a class="extra ${here && here.design === m.id ? "cur" : ""}" href="#/design/${course.id}/${m.id}"><span class="box ${m.design_viewed ? "done" : ""}">${m.design_viewed ? "✓" : ""}</span>System design question</a>`;
@@ -254,6 +255,69 @@ function modal(title, bodyHtml, actions = "") {
   bg.addEventListener("click", e => { if (e.target === bg || e.target.closest("[data-close]")) bg.remove(); });
   document.body.appendChild(bg); return bg;
 }
+
+/* ---------------------------------------------------------------- glossary
+   The first use of a glossary term in each slide (or box marked .gl-scope) gets a dotted
+   underline; hover, focus or tap it for the plain meaning. Terms come from glossary.toml. */
+
+const glossary = {course: null, terms: [], re: null};
+async function loadGlossary(courseId) {
+  if (!courseId || glossary.course === courseId) return;
+  glossary.course = courseId; glossary.terms = []; glossary.re = null;
+  try { glossary.terms = await api("GET", `/api/courses/${courseId}/glossary`); } catch { return; }
+  const index = new Map();
+  glossary.terms.forEach((t, i) => [t.term, ...t.aliases].forEach(w => {
+    index.set(w, i);
+    // Lower-case words also match at the start of a sentence; CAPS words (GET, API) match only as written.
+    if (w === w.toLowerCase() && /^[a-z]/.test(w)) index.set(w[0].toUpperCase() + w.slice(1), i);
+  }));
+  const words = [...index.keys()].sort((a, b) => b.length - a.length).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  glossary.index = index;
+  glossary.re = words.length ? new RegExp(`(?<![\\w/{.-])(${words.join("|")})(?![\\w}-])`, "g") : null;
+}
+const GL_SKIP = "code,pre,a,button,h1,h2,textarea,input,select,summary,.gl,.codeview,.label";
+function glossify(root) {
+  if (!glossary.re) return;
+  for (const scope of $$(".slide, .gl-scope", root)) {
+    if (scope.dataset.gl) continue; scope.dataset.gl = "1";
+    const seen = new Set();
+    const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT, {acceptNode: n =>
+      n.parentElement.closest(GL_SKIP) || (n.parentElement.closest(".slide, .gl-scope") !== scope) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT});
+    const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+    for (const node of nodes) {
+      const text = node.nodeValue; glossary.re.lastIndex = 0;
+      let m, last = 0; const frag = document.createDocumentFragment();
+      while ((m = glossary.re.exec(text))) {
+        const i = glossary.index.get(m[1]);
+        if (seen.has(i)) continue; seen.add(i);
+        frag.append(text.slice(last, m.index));
+        const span = document.createElement("span"); span.className = "gl"; span.tabIndex = 0; span.dataset.t = i; span.textContent = m[1];
+        frag.append(span); last = m.index + m[1].length;
+      }
+      if (last) { frag.append(text.slice(last)); node.replaceWith(frag); }
+    }
+  }
+}
+function glossPop(span) {
+  let pop = $("#glpop");
+  if (!span) { pop && pop.remove(); return; }
+  const t = glossary.terms[+span.dataset.t]; if (!t) return;
+  if (!pop) { pop = document.createElement("div"); pop.id = "glpop"; pop.className = "glpop px"; pop.setAttribute("role", "tooltip"); document.body.appendChild(pop); }
+  pop.innerHTML = `<b>${esc(t.term)}</b><p>${esc(t.plain)}</p>${t.analogy ? `<p class="an">Like: ${esc(t.analogy)}</p>` : ""}${t.example ? `<pre>${esc(t.example)}</pre>` : ""}`;
+  const r = span.getBoundingClientRect(), w = Math.min(320, innerWidth - 24);
+  pop.style.width = w + "px";
+  pop.style.left = Math.max(12, Math.min(r.left, innerWidth - w - 12)) + "px";
+  const below = r.bottom + 8, h = pop.offsetHeight;
+  pop.style.top = (below + h < innerHeight - 8 ? below : Math.max(8, r.top - h - 8)) + "px";
+}
+document.addEventListener("mouseover", e => { const s = e.target.closest(".gl"); if (s) glossPop(s); else if (!e.target.closest("#glpop") && $("#glpop") && !$("#glpop").dataset.pinned) glossPop(null); });
+document.addEventListener("focusin", e => { const s = e.target.closest(".gl"); if (s) glossPop(s); });
+document.addEventListener("focusout", e => { if (e.target.closest(".gl")) glossPop(null); });
+document.addEventListener("click", e => {  // tap support for touch screens
+  const s = e.target.closest(".gl");
+  if (s) { glossPop(s); $("#glpop").dataset.pinned = "1"; } else if (!e.target.closest("#glpop")) glossPop(null);
+});
+document.addEventListener("scroll", () => glossPop(null), true);
 
 /* ---------------------------------------------------------------- home */
 
@@ -298,19 +362,25 @@ async function renderLesson(courseId, moduleId, lessonId, step) {
   const done = s => !!(L.progress.steps[s] && L.progress.steps[s].done);
   const nextStep = steps[steps.indexOf(step) + 1];
   const href = s => `#/learn/${courseId}/${moduleId}/${lessonId}/${s}`;
+  const bonus = s => (L.lesson.optional_steps || []).includes(s);
+  const nextLesson = L.next ? `<a class="btn primary drop" href="#/learn/${courseId}/${L.next.module}/${L.next.lesson}">Next lesson: ${esc(L.next.title)} ▸</a>` : `<a class="btn primary drop" href="#/">Home ▸</a>`;
 
   app.innerHTML = `
     <div class="top">
       <span class="crumbs"><a href="#/">${esc(L.course.title)}</a> › ${esc(L.module.title)} › <b>${esc(L.lesson.title)}</b></span>
       <span class="spacer"></span>
-      <div class="steps">${steps.map(s => `<a class="step ${s === step ? "cur" : done(s) ? "done" : ""}" href="${href(s)}">${STEP_LABEL[s]}</a>`).join("")}</div>
+      <div class="steps">${steps.map(s => `<a class="step ${s === step ? "cur" : done(s) ? "done" : ""} ${bonus(s) ? "bonus" : ""}" href="${href(s)}" ${bonus(s) ? 'title="Bonus step: optional"' : ""}>${STEP_LABEL[s]}${bonus(s) ? "<small>⭐ bonus</small>" : ""}</a>`).join("")}</div>
     </div>
     <div class="layout">${courseSidebar(course, {module: moduleId, lesson: lessonId})}<div class="left md" id="left"></div><div class="right" id="right"></div></div>`;
   const left = $("#left"), right = $("#right");
   current = {base, L, courseId, moduleId, lessonId, step, href};
-  const nextBtn = nextStep ? `<p style="margin-top:22px"><a class="btn primary drop" href="${href(nextStep)}">Next: ${STEP_LABEL[nextStep]} ▸</a></p>` : "";
+  // After the last required step the lesson is complete: offer the bonus step and the next lesson side by side.
+  const nextBtn = !nextStep ? `<p style="margin-top:22px">${nextLesson}</p>`
+    : bonus(nextStep) ? `<div class="win px" style="margin-top:22px">${sprite("mascot", 3)}<div style="flex:1"><span class="label">Lesson complete!</span><br>Want more? <b>${STEP_LABEL[nextStep]}</b> is a bonus step: optional, for extra depth.</div></div>
+        <p style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">${nextLesson}<a class="btn drop" href="${href(nextStep)}">⭐ Bonus: ${STEP_LABEL[nextStep]} ▸</a></p>`
+    : `<p style="margin-top:22px"><a class="btn primary drop" href="${href(nextStep)}">Next: ${STEP_LABEL[nextStep]} ▸</a></p>`;
   const views = {concept: viewConcept, predict: viewPredict, review: viewReview, fix: viewFix, prove: viewProve, defend: viewDefend};
-  await views[step]({left, right, L, nextBtn, base, href, done});
+  await views[step]({left, right, L, nextBtn, base, href, done, bonus});
   const cur = $(".side a.cur"); if (cur) cur.scrollIntoView({block: "center"});
 }
 
@@ -340,8 +410,8 @@ async function viewConcept({left, right, L, nextBtn, base}) {
     review: "Review a pull request and flag what's wrong.", fix: "Fix the code until the tests pass.",
     prove: "Write one test that catches the bug.", defend: "Answer senior interview questions."};
   right.innerHTML = `<div class="scroll md mission"><h2>${esc(L.lesson.title)}</h2><p class="note">${esc(L.lesson.summary)} · about ${L.lesson.minutes} min</p>
-    <div class="task px"><span class="label">Your mission</span>${L.task}</div>
-    <h3>How this lesson works</h3><ol>${L.lesson.steps.map(s => `<li><b>${STEP_LABEL[s]}</b>: ${labels[s]}</li>`).join("")}</ol>
+    <div class="task px gl-scope"><span class="label">Your mission</span>${L.task}</div>
+    <h3>How this lesson works</h3><ol class="gl-scope">${L.lesson.steps.map(s => `<li><b>${STEP_LABEL[s]}</b>${(L.lesson.optional_steps || []).includes(s) ? " ⭐ <i>bonus</i>" : ""}: ${labels[s]}</li>`).join("")}</ol>
     <div class="bubble">${sprite("mascot", 3)}<div class="say px">Your code lives in <code>${esc(L.exercise_dir)}/</code>. Edit it here or in your own IDE; both stay in sync.</div></div></div>`;
   if (!L.check.length && !(L.progress.steps.concept && L.progress.steps.concept.done)) {
     api("POST", base + "/steps/concept/done").then(() => { markChip("concept"); refreshSidebar(); }).catch(() => {});
@@ -352,7 +422,7 @@ async function viewConcept({left, right, L, nextBtn, base}) {
 async function viewPredict({left, right, L, nextBtn, base}) {
   const P = L.predict;
   const saved = L.progress.steps.predict && L.progress.steps.predict.data.answers;
-  left.innerHTML = `<h2>Predict</h2>${P.intro}<form id="pf">${P.questions.map((q, qi) => `
+  left.innerHTML = `<h2>Predict</h2><div class="gl-scope">${P.intro}</div><form id="pf" class="gl-scope">${P.questions.map((q, qi) => `
     <div class="question" data-q="${qi}"><div class="prompt">${q.prompt}</div>
     ${q.options.map((o, oi) => `<label class="opt"><input type="radio" name="q${qi}" value="${oi}" ${saved && saved[qi] === oi ? "checked" : ""}>${o}</label>`).join("")}
     <div class="explain hidden"></div></div>`).join("")}
@@ -382,20 +452,50 @@ async function viewPredict({left, right, L, nextBtn, base}) {
 }
 
 /* --- review */
+// Plain words for the review labels. The value is what review.toml and the grader use.
+const SEVERITY = [
+  {v: "blocker", label: "🔴 Must fix", desc: "Breaks things for users, loses data or is unsafe. The PR can't be merged until it's fixed."},
+  {v: "major", label: "🟠 Should fix", desc: "A real bug or risk, but not an emergency. Fix it in this PR if you can."},
+  {v: "nit", label: "⚪ Nice to have", desc: "A small tidy-up: naming, wording, style. Fine to merge without it."},
+];
+const CATEGORY = [
+  {v: "not_sure", label: "Not sure", desc: "That's fine. Finding the right line is what counts; the feedback will tell you the kind."},
+  {v: "correctness", label: "Wrong result", desc: "The code gives the wrong answer or the wrong status code."},
+  {v: "security", label: "Unsafe", desc: "Someone could abuse it, see data they shouldn't, or damage data."},
+  {v: "scale", label: "Breaks with many users", desc: "Fine for one user, falls over with many (slow, blocks others, runs out of memory)."},
+  {v: "reliability", label: "Crashes or fails sometimes", desc: "Works on the happy path, breaks when something unexpected happens (missing item, retry, timeout)."},
+  {v: "style", label: "Hard to read", desc: "Works, but the next person will struggle to understand or change it."},
+];
+const sevLabel = v => (SEVERITY.find(x => x.v === v) || {label: v}).label;
+const catLabel = v => (CATEGORY.find(x => x.v === v) || {label: v}).label;
+const howToReview = `<ol class="howto">
+    <li><b>Read</b> the PR description: what is it trying to do?</li>
+    <li><b>Read the code</b> on the right. Ask: what happens with a missing id, a duplicate, or the same request twice?</li>
+    <li><b>Click the line</b> that looks wrong. A comment box opens.</li>
+    <li>Pick <b>how bad</b> it is and, if you can, <b>what kind</b> of problem. "Not sure" is fine.</li>
+    <li>Write <b>one line</b> saying why, then press <b>Submit review</b>.</li></ol>
+  <h4>How bad is it?</h4><dl class="legend">${SEVERITY.map(x => `<dt>${x.label}</dt><dd>${x.desc}</dd>`).join("")}</dl>
+  <h4>What kind of problem?</h4><dl class="legend">${CATEGORY.slice(1).map(x => `<dt>${x.label}</dt><dd>${x.desc}</dd>`).join("")}</dl>`;
+
 async function viewReview({left, right, L, nextBtn, base}) {
   const R = L.review;
   const draftKey = `review:${L.course.id}:${L.lesson.key}`;
   const saved = L.progress.steps.review && L.progress.steps.review.data;
-  let comments = store.get(draftKey, null) || (saved && saved.comments) || [];
-  left.innerHTML = `<h2>Review the PR</h2>${R.description}
-    <p class="note">Click a line to comment. Pick a severity and a category, then say why in one line.</p>
-    <div class="task px"><span class="label">Goal</span>${esc(R.goal)} There are <b>${R.issue_count}</b> planted issues.</div>
+  let comments = (store.get(draftKey, null) || (saved && saved.comments) || []).map(c => ({severity: "major", category: "not_sure", text: "", ...c}));
+  const firstTime = !store.get("seen:howto", false); store.set("seen:howto", true);
+  left.innerHTML = `<h2>Review the PR</h2><div class="gl-scope">${R.description}</div>
+    <details class="fold px" id="howto" ${firstTime ? "open" : ""}><summary>❓ How to review</summary><div class="body gl-scope">${howToReview}</div></details>
+    <div class="task px gl-scope"><span class="label">Goal</span>${inline(R.goal)}${/problem/i.test(R.goal) ? "" : ` There ${R.issue_count === 1 ? "is <b>1</b> problem" : `are <b>${R.issue_count}</b> problems`} to find.`}</div>
+    ${R.hint ? `<p><button class="btn small" id="rhint">💡 Hint</button></p><div class="explain hidden gl-scope" id="rhinttext"><b>Hint.</b> ${R.hint}</div>` : ""}
     <div id="rres">${saved ? `<p class="note">Last time you found <b>${saved.found} of ${saved.total}</b>. Submit again to see the full breakdown.</p>` : ""}</div>
     <p style="margin-top:12px"><button class="btn primary drop" id="submit">Submit review</button></p><div id="rnext" class="${saved ? "" : "hidden"}">${nextBtn}</div>`;
   right.innerHTML = `<div class="pr"><b>${esc(R.title)}</b> by <b>${R.author === "ai" ? "ai-agent" : "junior-dev"}</b><span class="badge">${R.author === "ai" ? "AI-generated" : "junior dev"}</span> · ${esc(R.file)}</div>
     <div class="codeview review" id="code">${paintCode(R.code)}</div>`;
+  const rh = $("#rhint"); if (rh) rh.onclick = () => { $("#rhinttext").classList.remove("hidden"); rh.remove(); };
   const code = $("#code");
-  const opts = (v, list) => list.map(o => `<option ${o === v ? "selected" : ""}>${o}</option>`).join("");
+  const pills = (field, value, list) => `<div class="pills" role="radiogroup">${list.map(o =>
+    `<button type="button" class="pill ${o.v === value ? "on" : ""}" data-f="${field}" data-v="${o.v}" role="radio" aria-checked="${o.v === value}" title="${esc(o.desc)}">${o.label}</button>`).join("")}</div>`;
+  const descOf = c => `${esc((SEVERITY.find(x => x.v === c.severity) || {}).desc || "")} ${c.category !== "not_sure" ? `<br><b>${catLabel(c.category)}:</b> ${esc((CATEGORY.find(x => x.v === c.category) || {}).desc || "")}` : ""}`;
   function draw() {
     $$(".comment", code).forEach(c => c.remove());
     $$(".ln", code).forEach(l => l.classList.remove("flag"));
@@ -403,32 +503,53 @@ async function viewReview({left, right, L, nextBtn, base}) {
       const ln = $(`.ln[data-l="${c.line}"]`, code); if (!ln) return;
       ln.classList.add("flag");
       const box = document.createElement("div"); box.className = "comment px"; box.dataset.i = i;
-      box.innerHTML = `<div class="row"><b>Line ${c.line}</b><select data-f="severity">${opts(c.severity, ["blocker", "major", "nit"])}</select>
-        <select data-f="category">${opts(c.category, ["correctness", "security", "scale", "reliability", "style"])}</select>
-        <button class="btn small del" title="Delete comment">✕</button></div><textarea data-f="text" placeholder="Why is this a problem?">${esc(c.text)}</textarea>`;
+      box.innerHTML = `<div class="row"><b>Line ${c.line}</b><span class="spacer"></span><button class="btn small del" title="Delete comment">✕</button></div>
+        <div class="q">How bad is it?</div>${pills("severity", c.severity, SEVERITY)}
+        <div class="q">What kind of problem? <span class="note">(optional)</span></div>${pills("category", c.category, CATEGORY)}
+        <p class="desc">${descOf(c)}</p>
+        <textarea data-f="text" placeholder="Why is this a problem? One line is enough.">${esc(c.text)}</textarea>`;
       let after = ln; while (after.nextElementSibling && after.nextElementSibling.classList.contains("comment")) after = after.nextElementSibling;
       after.after(box);
     });
     store.set(draftKey, comments);
   }
   code.addEventListener("click", e => {
-    if (e.target.closest(".comment")) { if (e.target.closest(".del")) { comments.splice(+e.target.closest(".comment").dataset.i, 1); draw(); } return; }
+    const box = e.target.closest(".comment");
+    if (box) {
+      const c = comments[+box.dataset.i];
+      if (e.target.closest(".del")) { comments.splice(+box.dataset.i, 1); draw(); return; }
+      const pill = e.target.closest(".pill");
+      if (pill) {
+        c[pill.dataset.f] = pill.dataset.v; store.set(draftKey, comments);
+        $$(`.pill[data-f="${pill.dataset.f}"]`, box).forEach(p => { const on = p === pill; p.classList.toggle("on", on); p.setAttribute("aria-checked", on); });
+        $(".desc", box).innerHTML = descOf(c);
+      }
+      return;
+    }
     const ln = e.target.closest(".ln"); if (!ln) return;
-    comments.push({line: +ln.dataset.l, severity: "major", category: "correctness", text: ""}); draw();
-    const box = $$(".comment", code).filter(b => comments[+b.dataset.i].line === +ln.dataset.l).at(-1);
-    box && $("textarea", box).focus();
+    comments.push({line: +ln.dataset.l, severity: "major", category: "not_sure", text: ""}); draw();
+    const nb = $$(".comment", code).filter(b => comments[+b.dataset.i].line === +ln.dataset.l).at(-1);
+    nb && $("textarea", nb).focus();
   });
   code.addEventListener("input", e => { const box = e.target.closest(".comment"); if (!box) return; comments[+box.dataset.i][e.target.dataset.f] = e.target.value; store.set(draftKey, comments); });
-  code.addEventListener("change", e => { const box = e.target.closest(".comment"); if (!box) return; comments[+box.dataset.i][e.target.dataset.f] = e.target.value; store.set(draftKey, comments); });
   draw();
   $("#submit").onclick = async () => {
     if (!comments.length) return toast("Leave at least one comment first: click a line.");
     const r = await api("POST", base + "/review", {comments});
     const missed = r.issues.filter(x => !x.found), found = r.issues.filter(x => x.found);
+    const kindNote = x => {
+      const yours = x.your_comment.category;
+      if (x.category_match) return ` <span class="lock on">${catLabel(yours)} ✓</span>`;
+      if (yours === "not_sure") return ` <span class="lock">kind: ${catLabel(x.issue.category)}</span>`;
+      return ` <span class="lock">you said ${catLabel(yours)}; it's ${catLabel(x.issue.category)}</span>`;
+    };
+    const total = r.issues.length;
     $("#rres").innerHTML = `<h3>Your score</h3><div class="score">
-        <div><b>${r.found.blocker}/${r.total.blocker}</b>blockers</div><div><b>${r.found.major}/${r.total.major}</b>majors</div><div><b>${r.false_alarms.length}</b>false alarm${r.false_alarms.length === 1 ? "" : "s"}</div></div>
-      ${found.map(x => `<details class="fold px"><summary>✓ Found · line ${x.issue.lines[0]} · ${x.issue.severity}${x.category_match ? "" : ` <span class="lock">you said ${esc(x.your_comment.category)}, it's ${x.issue.category}</span>`}</summary><div class="body"><b>${esc(x.issue.title)}.</b> ${x.issue.explanation}</div></details>`).join("")}
-      ${missed.map(x => `<details class="fold px" open><summary>✗ Missed · line ${x.issue.lines[0]} · ${x.issue.severity}</summary><div class="body"><b>${esc(x.issue.title)}.</b> ${x.issue.explanation}</div></details>`).join("")}
+        <div><b>${found.length}/${total}</b>problem${total === 1 ? "" : "s"} found</div>
+        ${r.total.blocker ? `<div><b>${r.found.blocker}/${r.total.blocker}</b>must-fix</div>` : ""}
+        <div><b>${r.false_alarms.length}</b>false alarm${r.false_alarms.length === 1 ? "" : "s"}</div></div>
+      ${found.map(x => `<details class="fold px"><summary>✓ Found · line ${x.issue.lines[0]} · ${sevLabel(x.issue.severity)}${kindNote(x)}</summary><div class="body"><b>${esc(x.issue.title)}.</b> ${x.issue.explanation}</div></details>`).join("")}
+      ${missed.map(x => `<details class="fold px" open><summary>✗ Missed · line ${x.issue.lines[0]} · ${sevLabel(x.issue.severity)} · ${catLabel(x.issue.category)}</summary><div class="body"><b>${esc(x.issue.title)}.</b> ${x.issue.explanation}</div></details>`).join("")}
       ${r.false_alarms.map(c => `<details class="fold px"><summary>False alarm · line ${c.line}</summary><div class="body">Nothing planted here. If you still think it's a problem, say why in the PR; reviewers can be wrong too.</div></details>`).join("")}
       <details class="fold px"><summary>Model review (how a Lead would write it)</summary><div class="body">${r.model_review}</div></details>
       ${r.teaching_comment ? `<details class="fold px"><summary>One comment, written for a junior</summary><div class="body">${r.teaching_comment}</div></details>` : ""}`;
@@ -497,9 +618,10 @@ async function viewFix({left, right, L, nextBtn, base, done}) {
   let hintsShown = L.progress.hints_shown || 0;
   const sources = L.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>${s.note ? ` <span class="note">(${esc(s.note)})</span>` : ""}</li>`).join("");
   left.innerHTML = `<h2>${esc(L.lesson.title)}</h2>
-    <div class="task px"><span class="label">Task</span>${L.task}</div>
+    <div class="task px gl-scope"><span class="label">Task</span>${L.task}</div>
+    ${L.lesson.goals.length ? `<div class="goals px"><span class="label">Goals · one at a time</span><ol id="goals">${L.lesson.goals.map(g => `<li data-g="${esc(g.id)}"><span class="box"></span><span class="gl-scope">${inline(g.text)}</span></li>`).join("")}</ol></div>` : ""}
     <details class="fold px" id="hints" ${hintsShown ? "open" : ""}><summary>Hints <span class="lock" id="hintcount"></span></summary><div class="body"><div id="hintlist"></div><button class="btn small" id="morehint">Show a hint</button></div></details>
-    ${L.best_practice ? `<details class="fold px" id="bp" ${fixed ? "open" : ""}><summary>Best practice <span class="lock ${fixed ? "on" : ""}" id="bplock">${fixed ? "unlocked ✓" : "unlocks when tests pass · open early"}</span></summary><div class="body md">${L.best_practice}</div></details>` : ""}
+    ${L.best_practice ? `<details class="fold px" id="bp" ${fixed ? "open" : ""}><summary>Senior notes <span class="lock ${fixed ? "on" : ""}" id="bplock">${fixed ? "unlocked ✓" : "optional · open any time"}</span></summary><div class="body md">${L.best_practice}</div></details>` : ""}
     ${L.stretch ? `<details class="fold px"><summary>Stretch <span class="lock">${L.progress.stretch_done ? "done ✓" : "optional · own tests"}</span></summary><div class="body md">${L.stretch}${L.has_stretch_tests ? '<p><button class="btn" id="runstretch">▶ Run stretch tests</button></p>' : ""}</div></details>` : ""}
     <details class="fold px"><summary>Concept recap</summary><div class="body md">${L.concept}</div></details>
     <details class="fold px"><summary>Read more</summary><div class="body"><ul>${sources}</ul></div></details>
@@ -510,6 +632,19 @@ async function viewFix({left, right, L, nextBtn, base, done}) {
     $("#morehint").classList.toggle("hidden", hintsShown >= L.hints.length);
     $("#morehint").textContent = `Show hint ${hintsShown + 1}`;
   }
+  // Tick goals off from the last test run; highlight the first unfinished one.
+  function goalResults(run) {
+    const state = L.lesson.goals.map(g => { const cs = run.checks.filter(c => c.goal === g.id); return {g, cs, ok: cs.length > 0 && cs.every(c => c.outcome === "passed")}; });
+    const next = state.find(x => !x.ok);
+    state.forEach(x => { const li = $(`#goals li[data-g="${x.g.id}"]`); if (!li) return; li.classList.toggle("done", x.ok); li.classList.toggle("next", x === next); $(".box", li).textContent = x.ok ? "✓" : ""; });
+    if (run.error && !run.checks.length) return checksHtml(run);
+    const ungrouped = run.checks.filter(c => !c.goal && c.outcome !== "passed");
+    const head = next
+      ? `<div class="nextgoal px"><span class="label">Next goal ${state.indexOf(next) + 1} of ${state.length}</span><div>${inline(next.g.text)}</div></div>${checksHtml({...run, checks: next.cs.concat(ungrouped), passed: next.cs.filter(c => c.outcome === "passed").length, failed: next.cs.filter(c => c.outcome !== "passed").length + ungrouped.length}, "Tests for this goal")}`
+      : run.ok ? `<div class="nextgoal px ok-goal"><span class="label">All goals done ✓</span><div>Every test passes.</div></div>` : checksHtml(run);
+    return `${head}<details class="fold px"><summary>All ${run.passed + run.failed} tests · ${run.passed} passed</summary><div class="body">${checksHtml(run)}</div></details>`;
+  }
+  if (fixed) L.lesson.goals.forEach(g => { const li = $(`#goals li[data-g="${g.id}"]`); if (li) { li.classList.add("done"); $(".box", li).textContent = "✓"; } });
   const nextHint = () => { if (hintsShown >= L.hints.length) return toast("No more hints. Try Show solution."); hintsShown++; drawHints(); $("#hints").open = true; api("POST", base + "/hints", {shown: hintsShown}).catch(() => {}); };
   $("#morehint").onclick = nextHint; drawHints();
 
@@ -521,10 +656,10 @@ async function viewFix({left, right, L, nextBtn, base, done}) {
     try {
       await ed.flush();
       const r = await api("POST", base + "/run", {kind});
-      $("#results").innerHTML = checksHtml(r, kind === "core" ? "Tests" : "Stretch tests");
+      $("#results").innerHTML = kind === "core" && L.lesson.goals.length ? goalResults(r) : checksHtml(r, kind === "core" ? "Tests" : "Stretch tests");
       if (r.ok && kind === "core") {
         markChip("fix"); $("#fnext").classList.remove("hidden");
-        const bp = $("#bp"); if (bp && !bp.open) { bp.open = true; $("#bplock").textContent = "unlocked ✓"; $("#bplock").classList.add("on"); toast("All tests pass. Best practice unlocked."); }
+        const bp = $("#bp"); if (bp && !bp.open) { bp.open = true; $("#bplock").textContent = "unlocked ✓"; $("#bplock").classList.add("on"); toast("All tests pass. Senior notes unlocked."); }
         refreshSidebar();
       }
     } catch (err) { $("#results").innerHTML = `<h4><span class="bad">${esc(err.message)}</span></h4>`; }
@@ -545,7 +680,7 @@ async function viewFix({left, right, L, nextBtn, base, done}) {
 
 /* --- prove */
 async function viewProve({left, right, L, nextBtn, base, done}) {
-  left.innerHTML = `<h2>Prove it</h2>${L.prove_task || ""}
+  left.innerHTML = `<h2>Prove it <span class="tag">⭐ bonus</span></h2><div class="gl-scope">${L.prove_task || ""}</div>
     <div class="task px"><span class="label">Pass condition</span>Your test <b>fails</b> on the buggy PR <i>and</i> <b>passes</b> on the reference fix.</div>
     <div id="pres"></div><div id="pnext" class="${done("prove") ? "" : "hidden"}">${nextBtn}</div>`;
   async function prove() {
@@ -572,19 +707,23 @@ async function viewProve({left, right, L, nextBtn, base, done}) {
 /* --- defend */
 async function viewDefend({left, right, L, base, done}) {
   const key = q => `answer:${L.course.id}:${L.lesson.key}:${q}`;
-  left.innerHTML = `<h2>Defend it</h2><p class="note">Answer out loud or in the box, like in an interview. Then compare with the model answer.</p>
+  left.innerHTML = `<h2>Defend it <span class="tag">⭐ bonus</span></h2><p class="note">Answer out loud or in the box, like in an interview. Then compare with the model answer.</p>
     ${L.interview.map((q, i) => `<h3>Interview ${i + 1}</h3>${q.prompt}<textarea class="answer px" data-k="${i}" placeholder="Your answer…">${esc(store.get(key(i), ""))}</textarea>
       <details class="fold px"><summary>Reveal model answer</summary><div class="body md">${q.answer}</div></details>`).join("")}
     <div id="win"></div>`;
   $$("textarea.answer", left).forEach(t => t.addEventListener("input", () => store.set(key(t.dataset.k), t.value)));
   const sources = L.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join("");
-  right.innerHTML = `<div class="tool"><span class="label">Best practice</span></div><div class="scroll md">${L.best_practice || "<p class='note'>No best-practice notes for this lesson.</p>"}<h3>Read more</h3><ul>${sources}</ul></div>`;
+  right.innerHTML = `<div class="tool"><span class="label">Senior notes (optional)</span></div><div class="scroll md">${L.best_practice || "<p class='note'>No best-practice notes for this lesson.</p>"}<h3>Read more</h3><ul>${sources}</ul></div>`;
   function drawWin(lp) {
-    const missing = L.lesson.steps.filter(s => !(lp.steps[s] && lp.steps[s].done));
+    const optional = L.lesson.optional_steps || [];
+    const missing = L.lesson.steps.filter(s => !(lp.steps[s] && lp.steps[s].done) && !optional.includes(s));
     const next = L.next ? `<a class="btn primary drop" href="#/learn/${L.course.id}/${L.next.module}/${L.next.lesson}">Next lesson ▸</a>` : `<a class="btn primary drop" href="#/">Home ▸</a>`;
-    $("#win").innerHTML = lp.completed
-      ? `<div class="win px">${sprite("mascot", 3)}<div style="flex:1"><span class="label">Lesson complete!</span><br>${L.lesson.steps.map(s => "✓ " + STEP_LABEL[s]).join(" · ")}</div>${next}</div>`
-      : `<div class="win px" style="background:var(--panel-2)">${sprite("mascot", 3)}<div style="flex:1"><span class="label">Almost there</span><br>${missing.filter(s => s !== "defend").length ? "Still to do: " + missing.filter(s => s !== "defend").map(s => `<a href="${current.href(s)}">${STEP_LABEL[s]}</a>`).join(", ") : "Done reading? Finish the lesson."}</div><button class="btn primary drop" id="finish">I've answered these ✓</button></div>`;
+    const defended = !!(lp.steps.defend && lp.steps.defend.done);
+    const ticks = L.lesson.steps.map(s => `${lp.steps[s] && lp.steps[s].done ? "✓" : "·"} ${STEP_LABEL[s]}${optional.includes(s) ? " ⭐" : ""}`).join(" · ");
+    $("#win").innerHTML = (lp.completed
+      ? `<div class="win px">${sprite("mascot", 3)}<div style="flex:1"><span class="label">Lesson complete!</span><br>${ticks}</div>${next}</div>`
+      : `<div class="win px" style="background:var(--panel-2)">${sprite("mascot", 3)}<div style="flex:1"><span class="label">Almost there</span><br>Still to do: ${missing.map(s => `<a href="${current.href(s)}">${STEP_LABEL[s]}</a>`).join(", ")}</div></div>`)
+      + (defended ? "" : `<p style="margin-top:10px"><button class="btn drop" id="finish">⭐ I've answered these</button></p>`);
     const f = $("#finish"); if (f) f.onclick = async () => { const p = await api("POST", base + "/steps/defend/done"); markChip("defend"); drawWin(p); refreshSidebar(); };
   }
   drawWin(L.progress);
@@ -647,16 +786,18 @@ async function renderDesign(courseId, moduleId) {
 /* ---------------------------------------------------------------- router */
 
 async function route() {
-  teardown();
+  teardown(); glossPop(null);
   const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
   // Full-height work screens hide the decorative strips; CSS reads this flag.
   document.body.dataset.view = ["learn", "quiz", "design", "intro"].includes(parts[0]) ? "lesson" : "home";
   try {
+    if (parts[0] !== "" && parts[1]) await loadGlossary(parts[1]);
     if (parts[0] === "learn" && parts.length >= 4) await renderLesson(parts[1], parts[2], parts[3], parts[4]);
     else if (parts[0] === "quiz" && parts.length === 3) await renderQuiz(parts[1], parts[2]);
     else if (parts[0] === "design" && parts.length === 3) await renderDesign(parts[1], parts[2]);
     else if (parts[0] === "intro" && parts.length === 3) await renderIntro(parts[1], parts[2]);
     else await renderHome();
+    glossify(app);
     window.scrollTo(0, 0);
   } catch (err) {
     console.error(err);

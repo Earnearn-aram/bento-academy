@@ -1,0 +1,32 @@
+title = "Let teams create prompts"
+author = "junior"
+description = """
+**PR by a junior dev:** "Adds `POST /prompts` so teams can add their own prompts. Returns the new prompt 👍"
+"""
+goal = "There are 2 problems to find. Click each line and leave a comment."
+hint = "Compare this POST route with the slide **\"Read vs create\"**: what status should a create return, and how does the client learn the new prompt's address?"
+model_review = """
+**Request changes.** The prompt is saved correctly; the reply just doesn't say what happened.
+
+- 🟠 **Should fix, line 33:** returns the default `200`. A create should return `201 Created`.
+- 🟠 **Should fix, line 22:** no `Location` header, so clients must guess the new prompt's address.
+"""
+teaching_comment = """
+> Line 33: how does a client tell "I created something" apart from "I read something"? Both return `200` today. Could you add `status_code=201` here and a `Location` header with the new prompt's address? FastAPI's "Response Status Code" page shows how.
+"""
+
+[[issues]]
+id = "create-200"
+lines = [33, 33]
+severity = "major"
+category = "correctness"
+title = "Create returns 200, not 201"
+explanation = "FastAPI's default is `200`. Add `status_code=201` to the decorator so clients know something was created."
+
+[[issues]]
+id = "no-location"
+lines = [22, 22]
+severity = "major"
+category = "correctness"
+title = "No Location header"
+explanation = "The client can't tell where the new prompt lives. Set `response.headers[\"Location\"] = f\"/prompts/{id}\"`."

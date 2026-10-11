@@ -1,0 +1,14 @@
+intro = "One route, two bad requests. Guess each status, then press **Run it**."
+snippet = "predict/snippet.py"
+
+[[questions]]
+prompt = "**Q1.** `POST /tags` with an empty body (the `name` field is missing). What comes back?"
+options = ["`422`", "`409`", "`201`"]
+answer = 0
+explain = "FastAPI checks the body against the model first. Missing field → `422`."
+
+[[questions]]
+prompt = "**Q2.** `POST /tags` with name `ai` twice. The route has no duplicate check. What does the *second* one get?"
+options = ["`409`", "`201`, and now there are two `ai` tags", "`422`"]
+answer = 1
+explain = "Nothing stops it. FastAPI can't know your \"names must be unique\" rule: you add that check."

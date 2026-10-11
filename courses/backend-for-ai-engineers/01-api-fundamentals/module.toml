@@ -1,5 +1,5 @@
 id = "api-fundamentals"
-title = "API fundamentals"
+title = "API basics"
 short = "API basics"
 icon = "onigiri"
-summary = "HTTP methods and status codes, Pydantic models, async vs sync, timeouts and retries, errors, pagination, auth."
+summary = "Status codes and methods, one small idea at a time: 404, 201, safe GET, 409 vs 422, and safe retries."

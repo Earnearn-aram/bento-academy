@@ -1,0 +1,11 @@
+[[questions]]
+prompt = "Someone sends a prompt **without** a `template` field. Which status, and who sends it?"
+options = ["`409`, sent by your code", "`422`, sent by FastAPI automatically", "`500`"]
+answer = 1
+explain = "The body doesn't match the `PromptIn` model, so FastAPI rejects it with `422` before your code runs."
+
+[[questions]]
+prompt = "The body is valid, but the name `summarize` is already taken. Which status?"
+options = ["`409 Conflict`", "`422`", "`404`"]
+answer = 0
+explain = "The request is fine; it clashes with what already exists. That's `409`."

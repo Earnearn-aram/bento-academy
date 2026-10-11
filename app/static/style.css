@@ -236,7 +236,7 @@ body[data-view="lesson"] .announce,body[data-view="lesson"] .ticker{display:none
 @keyframes blink{50%{opacity:0}}
 
 @media (max-width:980px){
-  .layout,.layout.wide-left{grid-template-columns:1fr;height:auto}
+  .layout,.layout.wide-left{grid-template-columns:minmax(0,1fr);height:auto}
   .side{display:none}
   .left{border-right:0;border-bottom:var(--px) solid var(--ink)}
   .editor,.codeview{min-height:380px}
@@ -271,3 +271,47 @@ body[data-view="lesson"] .announce,body[data-view="lesson"] .ticker{display:none
 .deck-nav{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:2px dashed var(--grid)}
 .deck-nav .spacer{flex:1}
 @media (prefers-reduced-motion:reduce){.deck-track,.deck-viewport{transition:none}}
+
+/* ---- glossary: dotted underline, plain-English popover */
+.gl{text-decoration:underline dotted var(--link);text-decoration-thickness:2px;text-underline-offset:3px;cursor:help;border-radius:2px}
+.gl:hover,.gl:focus{background:var(--accent-soft);outline:none}
+.glpop{position:fixed;z-index:60;background:var(--panel);color:var(--ink);padding:10px 12px;font:15px/1.45 var(--body);box-shadow:4px 4px 0 var(--shadow)}
+.glpop b{display:block;font-size:16px;margin-bottom:2px}
+.glpop p{margin:4px 0}
+.glpop .an{color:var(--muted)}
+.glpop pre{margin:6px 0 0;padding:6px 8px;background:var(--code-bg);color:var(--code-ink);font:13px/1.4 var(--mono);white-space:pre-wrap}
+
+/* ---- review: plain-word pills and the how-to card */
+.comment .q{font-weight:700;font-size:13px;margin:6px 0 3px;color:var(--muted)}
+.pills{display:flex;flex-wrap:wrap;gap:5px}
+.pill{font:600 13px var(--body);padding:3px 10px;background:var(--panel-2);color:var(--ink);border:2px solid var(--ink);border-radius:999px;cursor:pointer}
+.pill:hover{background:var(--sky-soft)}
+.pill.on{background:var(--accent);color:var(--accent-ink)}
+.pill:focus-visible{outline:3px solid var(--sky);outline-offset:1px}
+.comment .desc{margin:6px 0;font-size:14px;color:var(--muted)}
+.howto{padding-left:20px;margin:4px 0 10px}
+.howto li{margin:3px 0}
+.legend{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:4px 0 10px;font-size:15px}
+.legend dt{font-weight:700}
+.legend dd{margin:0}
+@media (max-width:560px){.legend{grid-template-columns:1fr}.legend dd{margin-bottom:6px}}
+
+/* ---- fix: goal checklist */
+.goals{background:var(--panel);padding:10px 14px;margin:10px var(--px)}
+.goals>.label{display:block;color:var(--link);margin-bottom:4px}
+.goals ol{list-style:none;margin:0;padding:0}
+.goals li{display:flex;gap:10px;align-items:flex-start;padding:5px 6px;margin:2px 0}
+.goals li .box{flex:none;width:18px;height:18px;border:2px solid var(--ink);display:grid;place-items:center;font-size:12px;font-weight:800;margin-top:2px;background:var(--panel)}
+.goals li.done{color:var(--muted)}
+.goals li.done .box{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.goals li.next{background:var(--accent-soft);font-weight:700}
+.goals li.next::after{content:"◀ next";margin-left:auto;font-size:12px;color:var(--link);white-space:nowrap}
+.nextgoal{background:var(--accent-soft);padding:10px 14px;margin:8px var(--px) 10px}
+.nextgoal>.label{display:block;color:var(--link)}
+.nextgoal.ok-goal{background:var(--ok-soft)}
+.nextgoal.ok-goal>.label{color:var(--ok)}
+
+/* ---- bonus steps */
+.step.bonus{border-style:dashed}
+.step small{font-size:10px;margin-left:4px;opacity:.85}
+.side .star{margin-left:4px;font-size:12px}

@@ -19,7 +19,7 @@ import sys
 
 from . import discovery, runner
 from .discovery import ContentError, load_toml
-from .models import Course, InterviewFile, Lesson, PredictFile, QuizFile, ReviewFile
+from .models import Course, GlossaryFile, InterviewFile, Lesson, PredictFile, QuizFile, ReviewFile
 
 REQUIRED = ["lesson.md", "task.md", "hints.md", "interview.toml", "best_practice.md", "tests/test_core.py"]
 
@@ -68,6 +68,13 @@ async def check_lesson(course: Course, lesson: Lesson, solutions_only: bool) -> 
     if not sol.ok:
         bad = [f"{c.title}: {c.message}" for c in sol.checks if not c.passed]
         errors.append("solution fails core tests: " + "; ".join(bad or [sol.error or "?"]))
+    tested_goals = {c.goal for c in sol.checks if c.goal}
+    for goal in lesson.meta.goals:
+        if goal.id not in tested_goals:
+            errors.append(f"goal {goal.id!r} has no test marked @pytest.mark.goal({goal.id!r})")
+    unknown = tested_goals - {g.id for g in lesson.meta.goals}
+    if unknown:
+        errors.append(f"tests use goals not listed in meta.toml: {sorted(unknown)}")
     stretch = runner.lesson_tests(lesson, "stretch")
     if stretch[0].is_file():
         st = await runner.run_tests(course, lesson.solution_dir, stretch)
@@ -98,6 +105,12 @@ async def main_async(solutions_only: bool, only: str | None) -> int:
     total = 0
     for course in discovery.discover():
         print(f"\n🍱 {course.meta.title}")
+        if (course.dir / "glossary.toml").is_file():
+            try:
+                load_toml(course.dir / "glossary.toml", GlossaryFile)
+            except ContentError as exc:
+                failures += 1
+                print(f"  ✗ glossary: {exc}")
         for module in course.modules:
             for name in ("quiz.toml", "intro_check.toml"):
                 if (module.dir / name).is_file():
@@ -123,7 +136,7 @@ async def main_async(solutions_only: bool, only: str | None) -> int:
 def main() -> None:
     parser = argparse.ArgumentParser(prog="python -m app.check")
     parser.add_argument("--solutions-only", action="store_true", help="only run solutions against their tests")
-    parser.add_argument("--only", default=None, help="substring of a lesson key, e.g. methods-and-status")
+    parser.add_argument("--only", default=None, help="substring of a lesson key, e.g. not-found")
     args = parser.parse_args()
     try:
         sys.exit(asyncio.run(main_async(args.solutions_only, args.only)))

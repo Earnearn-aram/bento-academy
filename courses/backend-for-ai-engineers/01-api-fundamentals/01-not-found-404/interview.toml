@@ -1,0 +1,11 @@
+[[questions]]
+prompt = "A teammate says: \"Returning `200` with `null` is fine, the frontend can check for null.\" How do you answer?"
+answer = """
+The status code is the contract every client reads first, not just our frontend. With `200`:
+
+- **Every client** (mobile, the Slack bot, partners) must know to check for `null`, and one will forget.
+- **Caches and proxies** treat `200` as a real success and may store it.
+- **Dashboards** count it as a success, so "lots of lookups for prompts that don't exist" is invisible.
+
+`404` says the same thing once, at the protocol level, and every tool understands it. *(The reasoning is mine; the meanings of 200 and 404 come from MDN.)*
+"""

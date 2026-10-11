@@ -76,6 +76,17 @@ const SPRITES={
     "KwWWWWWDDWWWWwwK",
     ".KwwwwwDDwwwwwK.",
     "..KKKKKKKKKKKK.."],
+  gyoza:[
+    "................",
+    "......KKKK......",
+    "....KKCKKCKK....",
+    "...KCcKCCKcCK...",
+    "..KCCCCCCCCCcK..",
+    ".KCCCCCCCCCCCcK.",
+    "KCCCCCCCCCCCCccK",
+    "KNCCCCCCCCCCCcnK",
+    ".KNNNNNNNNNNNnK.",
+    "..KKKKKKKKKKKK.."],
   taiyaki:[
     ".....KKKKKK.....",
     "...KKNNNNNNKK.KK",

@@ -29,6 +29,7 @@ def pytest_configure(config):
     global _started
     _started = time.monotonic()
     config.addinivalue_line("markers", "best_practice: the check verifies a production best practice")
+    config.addinivalue_line("markers", "goal(id): the Fix-step goal (from meta.toml) this check belongs to")
 
 
 def _title(item) -> str:
@@ -68,6 +69,8 @@ def pytest_runtest_makereport(item, call):
     rep = outcome.get_result()
     rep.bento_title = _title(item)
     rep.bento_bp = item.get_closest_marker("best_practice") is not None
+    goal = item.get_closest_marker("goal")
+    rep.bento_goal = goal.args[0] if goal and goal.args else None
     rep.bento_msg = friendly(call.excinfo) if call.excinfo is not None and rep.failed else ""
 
 
@@ -82,6 +85,7 @@ def pytest_runtest_logreport(report):
             "message": "",
             "details": "",
             "best_practice": getattr(report, "bento_bp", False),
+            "goal": getattr(report, "bento_goal", None),
             "duration_s": 0.0,
         }
     entry = _results[rid]

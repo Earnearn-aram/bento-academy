@@ -1,0 +1,34 @@
+title = "Let teams edit prompts"
+author = "junior"
+description = """
+**PR by a junior dev:** "Adds `PUT /prompts/{id}` to edit a prompt. If the prompt doesn't exist it just creates it, so it never fails 👍"
+"""
+goal = "There are 2 problems to find: one real bug and one small tidy-up."
+hint = "Who chooses ids in this API, the client or the server? What happens later if a PUT creates prompt 42 and then `next_id` reaches 42? And look at the very top of the file."
+model_review = """
+**Request changes.**
+
+- 🟠 **Should fix, line 53:** `PUT` on an unknown id creates it. Ids come from `next_id`, so `POST` can hand out the same id later and overwrite it. Call `get_or_404(prompt_id)` first.
+- ⚪ **Nice to have, line 3:** `json` is unused.
+
+"Never fails" sounds nice, but here it hides a real problem.
+"""
+teaching_comment = """
+> Line 53: who picks ids here, the client or the server? If a PUT creates prompt 42, what happens when `next_id` reaches 42? I'd return `404` for unknown ids. MDN's PUT and "Idempotent" pages are good background.
+"""
+
+[[issues]]
+id = "put-creates"
+lines = [53, 53]
+severity = "major"
+category = "reliability"
+title = "PUT on an unknown id creates it"
+explanation = "The server picks ids with `next_id`, so a PUT-created id can be handed out again by POST and overwritten. Return 404."
+
+[[issues]]
+id = "unused-import"
+lines = [3, 3]
+severity = "nit"
+category = "style"
+title = "Unused import"
+explanation = "`json` is never used. Harmless, but tidy it up."

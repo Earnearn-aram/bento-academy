@@ -17,6 +17,7 @@ from . import discovery, files, progress, review, runner
 from .discovery import ContentError, load_toml
 from .models import (
     Course,
+    GlossaryFile,
     InterviewFile,
     Lesson,
     PredictFile,
@@ -135,6 +136,15 @@ def course_summary(course: Course) -> dict:
                             and prog.lessons[les.key].completed
                             and (prog.lessons[les.key].completed_version or 0) < les.meta.version
                         ),
+                        # ⭐ when every bonus step is done too
+                        "bonus_done": bool(
+                            les.meta.optional_steps
+                            and prog.lessons.get(les.key)
+                            and all(
+                                prog.lessons[les.key].steps.get(s) and prog.lessons[les.key].steps[s].done
+                                for s in les.meta.optional_steps
+                            )
+                        ),
                     }
                     for les in m.lessons
                 ],
@@ -173,6 +183,25 @@ def course_summary(course: Course) -> dict:
 @app.get("/api/config")
 def config() -> dict:
     return {"monaco_local": (VENDOR / "monaco" / "vs" / "loader.js").is_file()}
+
+
+@app.get("/api/courses/{course_id}/glossary")
+def glossary(course_id: str) -> list[dict]:
+    """Plain-English meanings, shown as popups on the first use of a term in each slide."""
+    course = get_course_or_404(course_id)
+    path = course.dir / "glossary.toml"
+    if not path.is_file():
+        return []
+    return [
+        {
+            "term": t.term,
+            "aliases": t.aliases,
+            "plain": t.plain,
+            "analogy": t.analogy,
+            "example": t.example,
+        }
+        for t in load_toml(path, GlossaryFile).terms
+    ]
 
 
 # ---------------------------------------------------------------- courses
@@ -222,6 +251,7 @@ def get_lesson(course_id: str, module_id: str, lesson_id: str) -> dict:
             "file": Path(rf.file).name,
             "code": (d / rf.file).read_text(encoding="utf-8"),
             "issue_count": len(rf.issues),
+            "hint": html(rf.hint) if rf.hint else None,
         }
 
     interview = []
@@ -252,6 +282,8 @@ def get_lesson(course_id: str, module_id: str, lesson_id: str) -> dict:
             "minutes": lesson.meta.minutes,
             "version": lesson.meta.version,
             "steps": lesson.steps,
+            "optional_steps": lesson.meta.optional_steps,
+            "goals": [g.model_dump() for g in lesson.meta.goals],
         },
         "prev": lesson_ref(all_lessons[idx - 1]) if idx > 0 else None,
         "next": lesson_ref(all_lessons[idx + 1]) if idx + 1 < len(all_lessons) else None,

@@ -1,0 +1,5 @@
+id = "resilient-apis"
+title = "Resilient APIs"
+short = "Resilient"
+icon = "gyoza"
+summary = "Slow calls that don't freeze everyone, timeouts, retries with backoff, one error shape, 502 vs 504, pages that never skip, API keys and JWT."
