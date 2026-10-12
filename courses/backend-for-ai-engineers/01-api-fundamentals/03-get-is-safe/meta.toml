@@ -32,3 +32,8 @@ url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/DELET
 [[sources]]
 title = "MDN: 204 No Content"
 url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/204"
+
+[[sources]]
+title = "RFC 9110 (the HTTP standard): safe methods"
+url = "https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.1"
+research = "R6"

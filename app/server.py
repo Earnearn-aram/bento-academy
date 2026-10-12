@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from markdown_it import MarkdownIt
 from pydantic import BaseModel
 
-from . import discovery, files, progress, review, runner
+from . import discovery, files, progress, research, review, runner
 from .discovery import ContentError, load_toml
 from .models import (
     Course,
@@ -271,6 +271,7 @@ def get_lesson(course_id: str, module_id: str, lesson_id: str) -> dict:
         file_payload.append({"name": name, "content": content, "mtime_ns": str(mtime)})
 
     prog = progress.lesson(progress.load(), course.meta.id, lesson.key)
+    found = research.findings() if any(s.research for s in lesson.meta.sources) else {}
     return {
         "course": {"id": course.meta.id, "title": course.meta.title},
         "module": {"id": module.meta.id, "title": module.meta.title, "icon": module.meta.icon},
@@ -306,7 +307,10 @@ def get_lesson(course_id: str, module_id: str, lesson_id: str) -> dict:
         "predict": predict,
         "review": review_data,
         "interview": interview,
-        "sources": [s.model_dump() for s in lesson.meta.sources],
+        "sources": [
+            {**s.model_dump(), "research_read_on": found[s.research].meta.get("read_on") if s.research in found else None}
+            for s in lesson.meta.sources
+        ],
         "files": file_payload,
         "entry_file": lesson.meta.files[0],
         "prove_file": lesson.meta.prove_file if "prove" in lesson.steps else None,

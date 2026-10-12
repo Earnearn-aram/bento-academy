@@ -129,7 +129,7 @@ plain = "A simple text format for data: {\"name\": \"summarize\"}. Almost every 
 [[terms]]
 term = "safe"
 aliases = ["safe method", "safe methods"]
-plain = "A method is safe when calling it never changes anything on the server. GET is safe."
+plain = "A method is safe when calling it asks for no change to your data. GET is safe. (The server may still write a log line.)"
 analogy = "Reading a book doesn't change the book."
 
 [[terms]]

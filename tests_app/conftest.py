@@ -12,7 +12,7 @@ SANDBOX = Path(tempfile.mkdtemp(prefix="bento-app-tests-"))
 
 
 def _copy_content() -> None:
-    for name in ("courses", "solutions", "tools"):
+    for name in ("courses", "solutions", "tools", "research"):
         shutil.copytree(REPO / name, SANDBOX / name, ignore=shutil.ignore_patterns(".venv", "__pycache__"))
     # Reuse each course's installed environment instead of creating a new one.
     for venv in (REPO / "courses").glob("*/.venv"):
