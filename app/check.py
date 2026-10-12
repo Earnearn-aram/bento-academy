@@ -17,7 +17,7 @@ import asyncio
 import re
 import sys
 
-from . import discovery, runner
+from . import discovery, research, runner
 from .discovery import ContentError, load_toml
 from .models import Course, GlossaryFile, InterviewFile, Lesson, PredictFile, QuizFile, ReviewFile
 
@@ -103,7 +103,20 @@ async def check_lesson(course: Course, lesson: Lesson, solutions_only: bool) -> 
 async def main_async(solutions_only: bool, only: str | None) -> int:
     failures = 0
     total = 0
-    for course in discovery.discover():
+    courses = discovery.discover()
+    # Research is shared by all courses (research/README.md): check it once.
+    cited: dict[str, list[str]] = {}
+    for course in courses:
+        for module in course.modules:
+            for lesson in module.lessons:
+                for src in lesson.meta.sources:
+                    if src.research:
+                        cited.setdefault(src.research, []).append(lesson.key)
+    research_errors = research.check(cited)
+    print(f"\n{'✗' if research_errors else '✓'} research: {len(research.findings())} findings, {len(cited)} cited by lessons")
+    for e in research_errors:
+        print(f"    - {e}")
+    for course in courses:
         print(f"\n🍱 {course.meta.title}")
         if (course.dir / "glossary.toml").is_file():
             try:
@@ -130,7 +143,7 @@ async def main_async(solutions_only: bool, only: str | None) -> int:
                     print(f"      - {e}")
                 failures += bool(errors)
     print(f"\n{total - failures} of {total} lessons OK." if total else "\nNo lessons found.")
-    return 1 if failures else 0
+    return 1 if failures or research_errors else 0
 
 
 def main() -> None:

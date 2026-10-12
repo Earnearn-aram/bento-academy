@@ -28,3 +28,13 @@ url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods"
 [[sources]]
 title = "MDN: PUT"
 url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/PUT"
+
+[[sources]]
+title = "RFC 9110 (the HTTP standard): idempotent methods"
+url = "https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.2"
+research = "R6"
+
+[[sources]]
+title = "Stripe: idempotent requests (how a POST is made safe to retry)"
+url = "https://docs.stripe.com/api/idempotent_requests"
+research = "R3"

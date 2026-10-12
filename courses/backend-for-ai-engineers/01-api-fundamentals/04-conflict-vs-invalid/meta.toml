@@ -28,3 +28,8 @@ url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"
 [[sources]]
 title = "FastAPI: Request Body"
 url = "https://fastapi.tiangolo.com/tutorial/body/"
+
+[[sources]]
+title = "RFC 9110 (the HTTP standard): 409 Conflict"
+url = "https://www.rfc-editor.org/rfc/rfc9110.html#section-15.5.10"
+research = "R6"

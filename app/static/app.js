@@ -612,11 +612,15 @@ async function mountEditor({right, L, base, fileName, toolbarHtml, onRun}) {
   return {flush: async () => { saver.cancel(); await save(); }, resetFiles};
 }
 
+// Read more links. A source checked in research/findings gets a small tag with the date it was read.
+const sourceList = list => list.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>${s.note ? ` <span class="note">(${esc(s.note)})</span>` : ""}${s.research
+  ? ` <span class="tag" title="Checked against the official page in research/findings/${esc(s.research)}">checked in research ${esc(s.research)}${s.research_read_on ? " · read " + esc(s.research_read_on) : ""}</span>` : ""}</li>`).join("");
+
 /* --- fix */
 async function viewFix({left, right, L, nextBtn, base, done}) {
   const fixed = done("fix");
   let hintsShown = L.progress.hints_shown || 0;
-  const sources = L.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>${s.note ? ` <span class="note">(${esc(s.note)})</span>` : ""}</li>`).join("");
+  const sources = sourceList(L.sources);
   left.innerHTML = `<h2>${esc(L.lesson.title)}</h2>
     <div class="task px gl-scope"><span class="label">Task</span>${L.task}</div>
     ${L.lesson.goals.length ? `<div class="goals px"><span class="label">Goals · one at a time</span><ol id="goals">${L.lesson.goals.map(g => `<li data-g="${esc(g.id)}"><span class="box"></span><span class="gl-scope">${inline(g.text)}</span></li>`).join("")}</ol></div>` : ""}
@@ -712,7 +716,7 @@ async function viewDefend({left, right, L, base, done}) {
       <details class="fold px"><summary>Reveal model answer</summary><div class="body md">${q.answer}</div></details>`).join("")}
     <div id="win"></div>`;
   $$("textarea.answer", left).forEach(t => t.addEventListener("input", () => store.set(key(t.dataset.k), t.value)));
-  const sources = L.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join("");
+  const sources = sourceList(L.sources);
   right.innerHTML = `<div class="tool"><span class="label">Senior notes (optional)</span></div><div class="scroll md">${L.best_practice || "<p class='note'>No best-practice notes for this lesson.</p>"}<h3>Read more</h3><ul>${sources}</ul></div>`;
   function drawWin(lp) {
     const optional = L.lesson.optional_steps || [];

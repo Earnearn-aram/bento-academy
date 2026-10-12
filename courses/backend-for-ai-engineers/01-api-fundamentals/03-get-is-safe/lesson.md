@@ -11,7 +11,7 @@ The **method** says what the client wants to do:
 
 ## GET must be safe
 
-A **safe method** asks for *no change*. `GET` is safe.
+A **safe method** asks the server for *no change* to your data. `GET` is safe. (The server may still write a log line; that's fine.)
 
 Because of that, browsers, search crawlers and chat apps send `GET` requests **on their own**, for previews and pre-loading. If a GET deletes something, they'll delete it.
 

@@ -234,3 +234,27 @@ def test_module_intro_and_its_check(client):
     summary = client.get(f"/api/courses/{COURSE}").json()
     assert summary["modules"][0]["intro_done"] is True
     assert client.get(f"/api/courses/{COURSE}/modules/streaming/intro").status_code == 404
+
+
+def test_sources_show_research_tag(client):
+    lesson5 = f"/api/courses/{COURSE}/lessons/api-fundamentals/safe-to-retry"
+    tagged = [s for s in client.get(lesson5).json()["sources"] if s["research"]]
+    assert {s["research"] for s in tagged} == {"R3", "R6"}
+    assert all(s["research_read_on"] == "2026-10-06" for s in tagged)
+
+
+def test_research_check_catches_bad_citations():
+    from app import research
+
+    assert research.check({"R6": ["api-fundamentals/safe-to-retry"]}) == []
+    errors = research.check({"R99": ["api-fundamentals/safe-to-retry"]})
+    assert errors == ["api-fundamentals/safe-to-retry cites research R99, which has no finding"]
+
+
+def test_research_frontmatter_parser():
+    from app.research import frontmatter
+
+    meta = frontmatter("---\nid: R1\nsources:\n  - url: https://x\n    page_last_updated: no\nused_by: []\n---\n# body")
+    assert meta == {"id": "R1", "sources": ["url: https://x"], "used_by": []}
+    with pytest.raises(ValueError):
+        frontmatter("# no frontmatter")

@@ -30,6 +30,7 @@ class Source(ContentModel):
     title: str
     url: str
     note: str | None = None
+    research: str | None = Field(default=None, pattern=r"^R\d+$")  # e.g. "R6": checked in research/findings
 
 
 class CourseEnv(ContentModel):

@@ -5,3 +5,19 @@ answer = """
 
 **On what to ship, it's a trade-off:** `404` is honest and catches client bugs; `204` every time keeps automatic retries quiet. Pick one, document it, and use it everywhere *(opinion)*.
 """
+
+[[questions]]
+prompt = "Clients sometimes time out on `POST /prompts` and retry, creating duplicates. `POST` isn't idempotent. How do you make it safe to retry?"
+answer = """
+Give each *attempt* an identity: an **idempotency key**. Stripe's API (v1) is the well-documented example:
+
+- The client sends a random key (Stripe suggests a V4 UUID) in an `Idempotency-Key` header on the `POST`, and reuses the **same key** on every retry of that one action.
+- The server saves the **first result** for that key (status code and body, even a `500`) and replays it for any repeat. Stripe marks a replay with `Idempotent-Replayed: true`.
+- Keys are kept for **at least 24 hours**, then may be pruned.
+- The same key with **different parameters** is an error: it's a client bug, not a retry.
+- Two requests with the same key **at the same moment**: the clashing one isn't saved and can be retried. Stripe's status table lists `409 Conflict` for this case.
+
+For us: store `key → (status, body)` next to the prompt, and wrap "check key, create prompt, save result" in one database transaction so two concurrent retries can't both create *(standard practice)*.
+
+Source: Stripe's idempotent requests and low-level error pages, checked in research R3.
+"""
